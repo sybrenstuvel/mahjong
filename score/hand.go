@@ -5,6 +5,8 @@ import "encoding/json"
 type Tile int
 
 const (
+    NO_TILE Tile = 0
+
     // Balls 11-19
     BALLS_BASE Tile = 10
     BALLS_1 Tile = BALLS_BASE + 1
@@ -115,19 +117,60 @@ func (tile Tile) IsSimple() bool {
     return tile < MAY_CHOW_BELOW && number > 1 && number < 9
 }
 
+func (tile Tile) Suit() Tile {
+    if tile >= MAY_CHOW_BELOW {
+        return NO_TILE
+    }
+
+    number := int(tile) % 10
+    return Tile(int(tile) - number)
+}
+
+func (tile Tile) Number() int {
+    if tile >= MAY_CHOW_BELOW {
+        return 0
+    }
+    return int(tile) % 10
+}
 
 // implements sort.Interface for []Tile based on tile order.
 type ByTileOrder []Tile
-
 func (a ByTileOrder) Len() int           { return len(a) }
 func (a ByTileOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTileOrder) Less(i, j int) bool { return a[i] < a[j] }
 
+// implements sort.Interface for []Set based on tile order.
+type SortSetsByTileOrder []Set
+func (a SortSetsByTileOrder) Len() int           { return len(a) }
+func (a SortSetsByTileOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a SortSetsByTileOrder) Less(i, j int) bool {
+    if len(a[j].Tiles) == 0 { return true }
+    if len(a[i].Tiles) == 0 { return false }
+
+    if a[i].Tiles[0] == a[j].Tiles[0] {
+        if len(a[j].Tiles) == 1 { return true }
+        if len(a[i].Tiles) == 1 { return false }
+        return a[i].Tiles[1] < a[j].Tiles[1]
+    }
+
+    return a[i].Tiles[0] < a[j].Tiles[0]
+}
+
+type SetType int
+
+const (
+    NO_SET = 0
+    PILLOW = 1
+    CHOW = 2
+    PUNG = 4
+    KONG = 8
+)
 
 // A set consists of one to four tiles.
 type Set struct {
     Tiles []Tile
     Concealed bool
+    set_type SetType
 }
 
 type Hand struct {

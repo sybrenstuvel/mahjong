@@ -71,6 +71,16 @@ const (
     SEASON_4 Tile = SEASON_BASE + 4
 )
 
+
+func (tile *Tile) IsValid() bool {
+    if *tile < MAY_CHOW_BELOW {
+        modulo := int(*tile) % 10
+        return 1 <= modulo && modulo <= 9
+    }
+
+    return tile.IsHonour() || tile.IsFlower() || tile.IsSeason()
+}
+
 func (tile *Tile) MarshalJSON() ([]byte, error) {
     return json.Marshal(tile.String())
 }
@@ -130,4 +140,5 @@ type Hand struct {
     LastTileOfWall bool
     RobbedTheKong bool
     OutInDraw bool
+    Winning bool
 };

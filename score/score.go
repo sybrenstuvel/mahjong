@@ -1,15 +1,8 @@
 package score
 
-import "sort"
-
-func IsValidTile(tile Tile) bool {
-    if BALLS_1   <= tile && tile <= BALLS_9 { return true }
-    if CHARS_1   <= tile && tile <= CHARS_9 { return true }
-    if BAMBOO_1  <= tile && tile <= BAMBOO_9 { return true }
-    if WIND_EAST <= tile && tile <= SEASON_4 { return true }
-
-    return false;
-}
+import (
+    "sort"
+)
 
 
 // Returns (is valid, is chow)
@@ -28,7 +21,7 @@ func IsValidSet(set Set) (bool, bool) {
     var is_chow bool
 
     for idx, tile := range set.Tiles {
-        if ! IsValidTile(tile) {
+        if ! tile.IsValid() {
             return false, false
         }
 
@@ -47,13 +40,13 @@ func IsValidSet(set Set) (bool, bool) {
     return true, false
 }
 
-// Returns (score, doubles)
-func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int) {
+// Returns (score, doubles, valid)
+func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
     // TODO: count score & doubles for flowers & seasons.
-    if len(set.Tiles) < 2 { return 0, 0 }
+    if len(set.Tiles) < 2 { return 0, 0, false }
 
     is_valid, is_chow := IsValidSet(*set)
-    if !is_valid || is_chow { return 0, 0 }
+    if !is_valid || is_chow { return 0, 0, is_valid }
 
     // If we're here, we know it's a pillow/pung/kong, so the
     // length and first tile determine the score.
@@ -74,13 +67,13 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int) {
     switch len(set.Tiles) {
     case 2:
         switch {
-        case scoring_wind: return 2,0
-        case tile.IsDragon(): return 2, 0
-        default: return 0, 0
+        case scoring_wind: return 2,0, true
+        case tile.IsDragon(): return 2, 0, true
+        default: return 0, 0, true
         }
     case 3, 4:
         switch {
-        case tile.IsTerminal(): return 4 * multiplier, 0
+        case tile.IsTerminal(): return 4 * multiplier, 0, true
         case tile.IsWind():
             var double int
             if scoring_wind {
@@ -88,16 +81,47 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int) {
             } else {
                 double = 0
             }
-            return 4 * multiplier, double
-        case tile.IsDragon(): return 4 * multiplier, 1
-        default: return 2 * multiplier, 0
+            return 4 * multiplier, double, true
+        case tile.IsDragon(): return 4 * multiplier, 1, true
+        default: return 2 * multiplier, 0, true
         }
     }
 
-    return 0, 0
+    panic("Impossible situation turned out to be possible after all.")
 }
 
 // Returns the score for the given hand.
-func Score(hand Hand) int {
-    return 0
+func Score(hand *Hand) int {
+    total_score := 0
+    total_doubles := 0
+    nr_of_pungs := 0
+    nr_of_pillows := 0
+
+    // Start by summing up the tile set scores.
+    for _, set := range hand.Sets {
+        set_score, set_doubles, is_valid := ScoreSet(&set, hand.WindOwn, hand.WindRound)
+
+        if !is_valid { continue; }
+
+        switch len(set.Tiles) {
+        case 2:
+            nr_of_pillows += 1
+        case 3, 4:
+            nr_of_pungs += 1
+        }
+
+        total_score += set_score
+        total_doubles += set_doubles
+    }
+
+    // Add extra scores.
+    if nr_of_pungs == 4 && nr_of_pillows == 1 {
+        // Winning hand!
+        total_score += 20
+        hand.Winning = true
+    } else {
+        hand.Winning = false
+    }
+
+    return total_score * 1 << uint(total_doubles)
 }

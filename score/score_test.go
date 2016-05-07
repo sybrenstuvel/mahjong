@@ -161,18 +161,18 @@ func TestSetScores(t *testing.T) {
     assert_set_score(32, 0, KONG, &Set{Tiles: []Tile{CHARS_9, CHARS_9, CHARS_9, CHARS_9}, Concealed: true})
 
     // Round winds
-    assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_ROUND, WIND_ROUND}})
-    assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_ROUND, WIND_ROUND, WIND_ROUND}})
-    assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_ROUND, WIND_ROUND, WIND_ROUND}, Concealed: true})
-    assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_ROUND, WIND_ROUND, WIND_ROUND, WIND_ROUND}})
-    assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_ROUND, WIND_ROUND, WIND_ROUND, WIND_ROUND}, Concealed: true})
+    assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST}})
+    assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}})
+    assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}, Concealed: true})
+    assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST, WIND_WEST}})
+    assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST, WIND_WEST}, Concealed: true})
 
     // Own winds
-    assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_OWN, WIND_OWN}})
-    assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_OWN, WIND_OWN, WIND_OWN}})
-    assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_OWN, WIND_OWN, WIND_OWN}, Concealed: true})
-    assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_OWN, WIND_OWN, WIND_OWN, WIND_OWN}})
-    assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_OWN, WIND_OWN, WIND_OWN, WIND_OWN}, Concealed: true})
+    assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH}})
+    assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}})
+    assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}, Concealed: true})
+    assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH, WIND_NORTH}})
+    assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH, WIND_NORTH}, Concealed: true})
 
     // Other winds
     assert_set_score(0, 0, PILLOW, &Set{Tiles: []Tile{WIND_EAST, WIND_EAST}})
@@ -194,6 +194,8 @@ func TestSetScores(t *testing.T) {
 func TestScore(t *testing.T) {
 
     assert_score := func(expected_score int, hand *Hand) {
+        hand.WindRound = WIND_ROUND
+        hand.WindOwn = WIND_OWN
         score := Score(hand)
 
         if score == expected_score {
@@ -232,7 +234,7 @@ func TestScore(t *testing.T) {
     // Two chows and a pung of simples
     hand = &Hand{Sets: []Set{
         Set{Tiles: []Tile{BAMBOO_4, BAMBOO_5, BAMBOO_6}},
-        Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
+        Set{Tiles: []Tile{BALLS_1, BALLS_3, BALLS_2}},
         Set{Tiles: []Tile{CHARS_4, CHARS_4, CHARS_4}},
     }}
     assert_score(2, hand)
@@ -354,6 +356,47 @@ func TestScore(t *testing.T) {
     }
     if ! hand.Winning {
         t.Error("Hand should have been recognised as winning.")
+    }
+
+    // Winning all-simples hand
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{BALLS_2, BALLS_2}},
+        Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
+        Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},
+        Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
+        Set{Tiles: []Tile{BAMBOO_2, BAMBOO_3, BAMBOO_4}},
+    }}
+    assert_score(22 * 2, hand)
+    if all_simples(hand, 44) == 0 {
+        t.Error("Hand should have been recognised as all simples.")
+    }
+
+    // None-winning all-simples hand
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{CHARS_6}},
+        Set{Tiles: []Tile{BALLS_2}},
+        Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
+        Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},
+        Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
+        Set{Tiles: []Tile{BAMBOO_2, BAMBOO_3, BAMBOO_4}},
+    }}
+    assert_score(4, hand)
+    if all_simples(hand, 4) == 0 {
+        t.Error("Hand should have been recognised as all simples.")
+    }
+
+    // None-winning terminals & honours hand
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{DRAGON_GREEN}},
+        Set{Tiles: []Tile{WIND_EAST}},
+        Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
+        Set{Tiles: []Tile{CHARS_1, CHARS_1, CHARS_1}}, // 4
+        Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}}, // 4 + 1d
+        Set{Tiles: []Tile{BAMBOO_9, BAMBOO_9, BAMBOO_9}}, // 4
+    }}
+    assert_score(16 * 8, hand)
+    if all_terminals_honours(hand, 128) == 0 {
+        t.Error("Hand should have been recognised as all terminals & honours.")
     }
 }
 

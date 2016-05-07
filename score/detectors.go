@@ -14,6 +14,8 @@ var detectors = []Detector{
     full_flush,
     three_concealed_pungs,
     chow_hand,
+    all_simples,
+    all_terminals_honours,
 }
 
 
@@ -33,6 +35,22 @@ func find_sets_of_type(hand *Hand, set_type SetType) chan *Set {
     return ch
 }
 
+
+func all_tiles(hand *Hand) chan Tile {
+    ch := make(chan Tile)
+
+    go func() {
+        for idx, _ := range hand.Sets {
+            set := &hand.Sets[idx]
+            for _, tile := range set.Tiles {
+                ch <- tile
+            }
+        }
+        close(ch)
+    }()
+
+    return ch
+}
 
 func pure_straight(hand *Hand, simple_score int) int {
     // Find the chows
@@ -131,4 +149,38 @@ func chow_hand(hand *Hand, simple_score int) int {
     }
 
     return 0
+}
+
+
+func all_simples(hand *Hand, simple_score int) int {
+    count := 0
+    for tile := range all_tiles(hand) {
+        count++
+        if ! tile.IsSimple() {
+            return 0
+        }
+    }
+
+    // Incomplete hand.
+    if count < 13 {
+        return 0
+    }
+    return 1
+}
+
+
+func all_terminals_honours(hand *Hand, simple_score int) int {
+    count := 0
+    for tile := range all_tiles(hand) {
+        count++
+        if !tile.IsTerminal() && !tile.IsHonour(){
+            return 0
+        }
+    }
+
+    // Incomplete hand.
+    if count < 13 {
+        return 0
+    }
+    return 1
 }

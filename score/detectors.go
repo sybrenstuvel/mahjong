@@ -13,6 +13,7 @@ var detectors = []Detector{
     all_pungs,
     full_flush,
     three_concealed_pungs,
+    chow_hand,
 }
 
 
@@ -108,6 +109,24 @@ func three_concealed_pungs(hand *Hand, simple_score int) int {
     }
 
     if count >= 3 {
+        return 1
+    }
+
+    return 0
+}
+
+
+func chow_hand(hand *Hand, simple_score int) int {
+    if (hand.Winning && simple_score > 20) || (!hand.Winning && simple_score > 0){
+        return 0
+    }
+
+    count := 0
+    for _ = range find_sets_of_type(hand, CHOW) {
+        count += 1
+    }
+
+    if count == 4 {
         return 1
     }
 

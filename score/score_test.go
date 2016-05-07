@@ -339,6 +339,22 @@ func TestScore(t *testing.T) {
     if ! hand.Winning {
         t.Error("Hand should have been recognised as winning.")
     }
+
+    // Winning chow hand
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{BALLS_2, BALLS_2}},
+        Set{Tiles: []Tile{BALLS_1, BALLS_2, BALLS_3}},
+        Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
+        Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
+        Set{Tiles: []Tile{BAMBOO_1, BAMBOO_2, BAMBOO_3}},
+    }}
+    assert_score(40, hand)
+    if chow_hand(hand, 20) == 0 {
+        t.Error("Hand should have been recognised as chow hand.")
+    }
+    if ! hand.Winning {
+        t.Error("Hand should have been recognised as winning.")
+    }
 }
 
 func TestTile_Suit(t *testing.T) {

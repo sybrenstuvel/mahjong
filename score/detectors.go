@@ -12,6 +12,7 @@ var detectors = []Detector{
     pure_straight,
     all_pungs,
     full_flush,
+    three_concealed_pungs,
 }
 
 
@@ -95,4 +96,20 @@ func full_flush(hand *Hand, simple_score int) int {
     }
 
     return 4
+}
+
+
+func three_concealed_pungs(hand *Hand, simple_score int) int {
+    count := 0
+    for set := range find_sets_of_type(hand, PUNG + KONG) {
+        if set.Concealed {
+            count += 1
+        }
+    }
+
+    if count >= 3 {
+        return 1
+    }
+
+    return 0
 }

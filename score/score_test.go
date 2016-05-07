@@ -316,9 +316,25 @@ func TestScore(t *testing.T) {
         Set{Tiles: []Tile{BALLS_5, BALLS_5, BALLS_5}},
         Set{Tiles: []Tile{BAMBOO_8, BAMBOO_8, BAMBOO_8}},
     }}
-    assert_score((2 + 8 + 20) * 2, hand) // 56
-    if all_pungs(hand, 56) == 0 {
+    assert_score((2 + 8 + 20) * 2, hand) // 60
+    if all_pungs(hand, 60) == 0 {
         t.Error("Hand should have been recognised as all pungs.")
+    }
+    if ! hand.Winning {
+        t.Error("Hand should have been recognised as winning.")
+    }
+
+    // Non-winning hand with three concealed pungs
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},
+        Set{Tiles: []Tile{BALLS_7, BALLS_7, BALLS_7}, Concealed: true},
+        Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}, Concealed: true},
+        Set{Tiles: []Tile{BALLS_5, BALLS_5, BALLS_5, BALLS_5}, Concealed: true},
+        Set{Tiles: []Tile{BAMBOO_1, BAMBOO_2, BAMBOO_3}},
+    }}
+    assert_score((2 + 4 + 4 + 16 + 20) * 2, hand) // 92
+    if three_concealed_pungs(hand, 92) == 0 {
+        t.Error("Hand should have been recognised as three concealed pungs.")
     }
     if ! hand.Winning {
         t.Error("Hand should have been recognised as winning.")

@@ -173,6 +173,15 @@ type Set struct {
     set_type SetType
 }
 
+func (set *Set) HasTerminalOrHonour() bool {
+    for _, tile := range set.Tiles {
+        if tile.IsTerminal() || tile.IsHonour() {
+            return true
+        }
+    }
+    return false
+}
+
 type Hand struct {
     Sets []Set
     WindOwn Tile

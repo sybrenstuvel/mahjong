@@ -398,6 +398,46 @@ func TestScore(t *testing.T) {
     if all_terminals_honours(hand, 128) == 0 {
         t.Error("Hand should have been recognised as all terminals & honours.")
     }
+
+    // Winning half-flush
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},  // 2
+        Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
+        Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
+        Set{Tiles: []Tile{CHARS_4, CHARS_5, CHARS_6}},
+        Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},  // 2
+    }}
+    assert_score((20+2+4+2) * 4, hand) // 56
+    if half_flush(hand, 56) == 0 {
+        t.Error("Hand should have been recognised as half-flush.")
+    }
+
+    // Non-winning half-flush
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{DRAGON_GREEN}},
+        Set{Tiles: []Tile{WIND_EAST}},
+        Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
+        Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
+        Set{Tiles: []Tile{CHARS_4, CHARS_5, CHARS_6}},
+        Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},  // 2
+    }}
+    assert_score(24, hand)
+    if half_flush(hand, 24) == 0 {
+        t.Error("Hand should have been recognised as half-flush.")
+    }
+
+    // Outside hand
+    hand = &Hand{Sets: []Set{
+        Set{Tiles: []Tile{WIND_EAST, WIND_EAST}},
+        Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
+        Set{Tiles: []Tile{CHARS_3, CHARS_2, CHARS_1}},
+        Set{Tiles: []Tile{BAMBOO_9, BAMBOO_9, BAMBOO_9}}, // 4
+        Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1}},  // 4
+    }}
+    assert_score((20+4+4+4) * 4, hand)  // 128
+    if outside_hand(hand, 128) == 0 {
+        t.Error("Hand should have been recognised as outside hand.")
+    }
 }
 
 func TestTile_Suit(t *testing.T) {

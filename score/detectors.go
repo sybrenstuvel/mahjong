@@ -16,6 +16,8 @@ var detectors = []Detector{
     chow_hand,
     all_simples,
     all_terminals_honours,
+    half_flush,
+    outside_hand,
 }
 
 
@@ -106,11 +108,9 @@ func full_flush(hand *Hand, simple_score int) int {
     }
 
     // Check that every tile is of the same suit
-    for _, set := range hand.Sets {
-        for _, tile := range set.Tiles {
-            if tile.Suit() != suit {
-                return 0
-            }
+    for tile := range all_tiles(hand) {
+        if tile.Suit() != suit {
+            return 0
         }
     }
 
@@ -182,5 +182,57 @@ func all_terminals_honours(hand *Hand, simple_score int) int {
     if count < 13 {
         return 0
     }
+    return 1
+}
+
+
+func half_flush(hand *Hand, simple_score int) int {
+    suit := NO_TILE
+    seen_honour := false
+
+    count := 0
+    for tile := range all_tiles(hand) {
+        count++
+
+        switch {
+        case tile.IsHonour():
+            seen_honour = true
+        case suit == NO_TILE:
+            suit = tile.Suit()
+        case tile.Suit() != suit:
+            return 0
+        }
+    }
+
+    // That's a full flush, and is detected somewhere else.
+    if !seen_honour {
+        return 0
+    }
+
+    // Incomplete hand.
+    if count < 13 {
+        return 0
+    }
+
+    return 1
+}
+
+
+func outside_hand(hand *Hand, simple_score int) int {
+    nr_of_chows := 0
+    for idx, _ := range hand.Sets {
+        set := &hand.Sets[idx]
+        if set.set_type == CHOW {
+            nr_of_chows += 1
+        }
+        if ! set.HasTerminalOrHonour() {
+            return 0
+        }
+    }
+
+    if nr_of_chows == 0 {
+        return 0
+    }
+
     return 1
 }

@@ -144,6 +144,7 @@ type SortSetsByTileOrder []Set
 func (a SortSetsByTileOrder) Len() int           { return len(a) }
 func (a SortSetsByTileOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a SortSetsByTileOrder) Less(i, j int) bool {
+    // TODO: sort properly instead of hard-coded looking at idx 0 and 1.
     if len(a[j].Tiles) == 0 { return true }
     if len(a[i].Tiles) == 0 { return false }
 

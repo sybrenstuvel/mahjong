@@ -1,6 +1,9 @@
 package score
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+)
 
 // Tile represents a single MJ tile
 type Tile int
@@ -76,6 +79,11 @@ const (
 	Season4    Tile = seasonBase + 4
 )
 
+// Standard errors.
+var (
+	ErrTileNotValid = errors.New("tile not valid")
+)
+
 // IsValid returns true if the number of the tile represents a valid tile.
 func (tile Tile) IsValid() bool {
 	if tile < mayChowBelow {
@@ -88,7 +96,20 @@ func (tile Tile) IsValid() bool {
 
 // MarshalJSON converts a tile to JSON.
 func (tile Tile) MarshalJSON() ([]byte, error) {
-	return json.Marshal(tile.String())
+	return json.Marshal(int(tile))
+}
+
+// UnmarshalJSON reads a tile from JSON
+func (tile *Tile) UnmarshalJSON(data []byte) error {
+	tilenr := 0
+	if err := json.Unmarshal(data, &tilenr); err != nil {
+		return err
+	}
+	*tile = Tile(tilenr)
+	if !tile.IsValid() {
+		return ErrTileNotValid
+	}
+	return nil
 }
 
 // IsWind returns true for wind tiles.

@@ -38,10 +38,10 @@ func (s *ScoreTestSuite) TestTileValid(t *check.C) {
 }
 
 func (s *ScoreTestSuite) TestSetValid(t *check.C) {
-	assertSetValid := func(expectedValidity, expected_chow bool, set Set) {
+	assertSetValid := func(expectedValidity, expectedChow bool, set Set) {
 		validity, isChow := set.IsValid()
 
-		if validity == expectedValidity && isChow == expected_chow {
+		if validity == expectedValidity && isChow == expectedChow {
 			return
 		}
 
@@ -52,7 +52,7 @@ func (s *ScoreTestSuite) TestSetValid(t *check.C) {
 
 		t.Errorf("Set: %s\n", asJSON)
 		t.Errorf("Expected validity=%v is_chow=%v, got validity=%v is_chow=%v\n",
-			expectedValidity, expected_chow, validity, isChow)
+			expectedValidity, expectedChow, validity, isChow)
 	}
 
 	assertSetValid(false, false, Set{})

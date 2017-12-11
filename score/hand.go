@@ -52,21 +52,21 @@ const (
 	WIND_WEST  Tile = WIND_BASE + 3
 	WIND_NORTH Tile = WIND_BASE + 4
 
-	// Dragons 46-48
-	DRAGON_BASE  Tile = 45
+	// Dragons 51-54
+	DRAGON_BASE  Tile = 50
 	DRAGON_RED   Tile = DRAGON_BASE + 1
 	DRAGON_GREEN Tile = DRAGON_BASE + 2
 	DRAGON_WHITE Tile = DRAGON_BASE + 3
 
-	// Flowers 50-53
-	FLOWER_BASE Tile = 49
+	// Flowers 61-64
+	FLOWER_BASE Tile = 60
 	FLOWER_1    Tile = FLOWER_BASE + 1
 	FLOWER_2    Tile = FLOWER_BASE + 2
 	FLOWER_3    Tile = FLOWER_BASE + 3
 	FLOWER_4    Tile = FLOWER_BASE + 4
 
-	// Seasons 55-58
-	SEASON_BASE Tile = 54
+	// Seasons 71-74
+	SEASON_BASE Tile = 70
 	SEASON_1    Tile = SEASON_BASE + 1
 	SEASON_2    Tile = SEASON_BASE + 2
 	SEASON_3    Tile = SEASON_BASE + 3

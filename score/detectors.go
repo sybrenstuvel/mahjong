@@ -4,28 +4,28 @@
 
 package score
 
-// Returns the number of doubles from this detector
-type Detector func(hand *Hand, simple_score int) int
+// A Detector returns the number of doubles detected.
+type Detector func(hand *Hand, simpleScore int) int
 
-var detectors = []Detector{
-	pure_straight,
-	all_pungs,
-	full_flush,
-	three_concealed_pungs,
-	chow_hand,
-	all_simples,
-	all_terminals_honours,
-	half_flush,
-	outside_hand,
+var detectors = map[string]Detector{
+	"pure straight":         pureStraight,
+	"all pungs":             allPungs,
+	"full flush":            fullFlush,
+	"three concealed pungs": threeConcealedPungs,
+	"chow hand":             chowHand,
+	"all simples":           allSimples,
+	"all terminals/honours": allTerminalsHonours,
+	"half-flush":            halfFlush,
+	"outside hand":          outsideHand,
 }
 
-func find_sets_of_type(hand *Hand, set_type SetType) chan *Set {
+func findSetsOfType(hand *Hand, setType SetType) chan *Set {
 	ch := make(chan *Set)
 
 	go func() {
-		for idx, _ := range hand.Sets {
+		for idx := range hand.Sets {
 			set := &hand.Sets[idx]
-			if set.setType&set_type > 0 {
+			if set.setType&setType > 0 {
 				ch <- set
 			}
 		}
@@ -35,11 +35,11 @@ func find_sets_of_type(hand *Hand, set_type SetType) chan *Set {
 	return ch
 }
 
-func all_tiles(hand *Hand) chan Tile {
+func allTiles(hand *Hand) chan Tile {
 	ch := make(chan Tile)
 
 	go func() {
-		for idx, _ := range hand.Sets {
+		for idx := range hand.Sets {
 			set := &hand.Sets[idx]
 			for _, tile := range set.Tiles {
 				ch <- tile
@@ -51,39 +51,39 @@ func all_tiles(hand *Hand) chan Tile {
 	return ch
 }
 
-func pure_straight(hand *Hand, simple_score int) int {
+func pureStraight(hand *Hand, simpleScore int) int {
 	// Find the chows
-	nr_of_chows := 0
+	nrOfChows := 0
 	suit := NoTile
 
-	for chow := range find_sets_of_type(hand, Chow) {
+	for chow := range findSetsOfType(hand, Chow) {
 		switch {
 		case suit == NoTile:
 			suit = chow.Tiles[0].Suit()
 		case chow.Tiles[0].Suit() != suit:
 			return 0
-		// the sets must start with 1, 4, 7
-		case chow.Tiles[0].Number() != nr_of_chows*3+1:
+			// the sets must start with 1, 4, 7
+		case chow.Tiles[0].Number() != nrOfChows*3+1:
 			return 0
 		}
 
-		nr_of_chows++
+		nrOfChows++
 	}
 
-	if nr_of_chows < 3 {
+	if nrOfChows < 3 {
 		return 0
 	}
 
 	return 1
 }
 
-func all_pungs(hand *Hand, simple_score int) int {
+func allPungs(hand *Hand, simpleScore int) int {
 	if !hand.Winning {
 		return 0
 	}
 
 	count := 0
-	for _ = range find_sets_of_type(hand, Pung+Kong) {
+	for _ = range findSetsOfType(hand, Pung+Kong) {
 		count++
 	}
 
@@ -94,18 +94,18 @@ func all_pungs(hand *Hand, simple_score int) int {
 	return 0
 }
 
-func full_flush(hand *Hand, simple_score int) int {
+func fullFlush(hand *Hand, simpleScore int) int {
 	if len(hand.Sets) < 1 || len(hand.Sets[0].Tiles) < 1 {
 		return 0
 	}
 
-	var suit Tile = hand.Sets[0].Tiles[0].Suit()
+	suit := hand.Sets[0].Tiles[0].Suit()
 	if suit == NoTile {
 		return 0
 	}
 
 	// Check that every tile is of the same suit
-	for tile := range all_tiles(hand) {
+	for tile := range allTiles(hand) {
 		if tile.Suit() != suit {
 			return 0
 		}
@@ -114,11 +114,11 @@ func full_flush(hand *Hand, simple_score int) int {
 	return 4
 }
 
-func three_concealed_pungs(hand *Hand, simple_score int) int {
+func threeConcealedPungs(hand *Hand, simpleScore int) int {
 	count := 0
-	for set := range find_sets_of_type(hand, Pung+Kong) {
+	for set := range findSetsOfType(hand, Pung+Kong) {
 		if set.Concealed {
-			count += 1
+			count++
 		}
 	}
 
@@ -129,14 +129,14 @@ func three_concealed_pungs(hand *Hand, simple_score int) int {
 	return 0
 }
 
-func chow_hand(hand *Hand, simple_score int) int {
-	if (hand.Winning && simple_score > 20) || (!hand.Winning && simple_score > 0) {
+func chowHand(hand *Hand, simpleScore int) int {
+	if (hand.Winning && simpleScore > 20) || (!hand.Winning && simpleScore > 0) {
 		return 0
 	}
 
 	count := 0
-	for _ = range find_sets_of_type(hand, Chow) {
-		count += 1
+	for _ = range findSetsOfType(hand, Chow) {
+		count++
 	}
 
 	if count == 4 {
@@ -146,9 +146,9 @@ func chow_hand(hand *Hand, simple_score int) int {
 	return 0
 }
 
-func all_simples(hand *Hand, simple_score int) int {
+func allSimples(hand *Hand, simpleScore int) int {
 	count := 0
-	for tile := range all_tiles(hand) {
+	for tile := range allTiles(hand) {
 		count++
 		if !tile.IsSimple() {
 			return 0
@@ -162,9 +162,9 @@ func all_simples(hand *Hand, simple_score int) int {
 	return 1
 }
 
-func all_terminals_honours(hand *Hand, simple_score int) int {
+func allTerminalsHonours(hand *Hand, simpleScore int) int {
 	count := 0
-	for tile := range all_tiles(hand) {
+	for tile := range allTiles(hand) {
 		count++
 		if !tile.IsTerminal() && !tile.IsHonour() {
 			return 0
@@ -178,17 +178,17 @@ func all_terminals_honours(hand *Hand, simple_score int) int {
 	return 1
 }
 
-func half_flush(hand *Hand, simple_score int) int {
+func halfFlush(hand *Hand, simpleScore int) int {
 	suit := NoTile
-	seen_honour := false
+	seenHonour := false
 
 	count := 0
-	for tile := range all_tiles(hand) {
+	for tile := range allTiles(hand) {
 		count++
 
 		switch {
 		case tile.IsHonour():
-			seen_honour = true
+			seenHonour = true
 		case suit == NoTile:
 			suit = tile.Suit()
 		case tile.Suit() != suit:
@@ -197,7 +197,7 @@ func half_flush(hand *Hand, simple_score int) int {
 	}
 
 	// That's a full flush, and is detected somewhere else.
-	if !seen_honour {
+	if !seenHonour {
 		return 0
 	}
 
@@ -209,19 +209,19 @@ func half_flush(hand *Hand, simple_score int) int {
 	return 1
 }
 
-func outside_hand(hand *Hand, simple_score int) int {
-	nr_of_chows := 0
-	for idx, _ := range hand.Sets {
+func outsideHand(hand *Hand, simpleScore int) int {
+	nrOfChows := 0
+	for idx := range hand.Sets {
 		set := &hand.Sets[idx]
 		if set.setType == Chow {
-			nr_of_chows += 1
+			nrOfChows++
 		}
 		if !set.HasTerminalOrHonour() {
 			return 0
 		}
 	}
 
-	if nr_of_chows == 0 {
+	if nrOfChows == 0 {
 		return 0
 	}
 

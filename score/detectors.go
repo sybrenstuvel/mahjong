@@ -25,7 +25,7 @@ func find_sets_of_type(hand *Hand, set_type SetType) chan *Set {
 	go func() {
 		for idx, _ := range hand.Sets {
 			set := &hand.Sets[idx]
-			if set.set_type&set_type > 0 {
+			if set.setType&set_type > 0 {
 				ch <- set
 			}
 		}
@@ -54,11 +54,11 @@ func all_tiles(hand *Hand) chan Tile {
 func pure_straight(hand *Hand, simple_score int) int {
 	// Find the chows
 	nr_of_chows := 0
-	suit := NO_TILE
+	suit := NoTile
 
-	for chow := range find_sets_of_type(hand, CHOW) {
+	for chow := range find_sets_of_type(hand, Chow) {
 		switch {
-		case suit == NO_TILE:
+		case suit == NoTile:
 			suit = chow.Tiles[0].Suit()
 		case chow.Tiles[0].Suit() != suit:
 			return 0
@@ -83,7 +83,7 @@ func all_pungs(hand *Hand, simple_score int) int {
 	}
 
 	count := 0
-	for _ = range find_sets_of_type(hand, PUNG+KONG) {
+	for _ = range find_sets_of_type(hand, Pung+Kong) {
 		count++
 	}
 
@@ -100,7 +100,7 @@ func full_flush(hand *Hand, simple_score int) int {
 	}
 
 	var suit Tile = hand.Sets[0].Tiles[0].Suit()
-	if suit == NO_TILE {
+	if suit == NoTile {
 		return 0
 	}
 
@@ -116,7 +116,7 @@ func full_flush(hand *Hand, simple_score int) int {
 
 func three_concealed_pungs(hand *Hand, simple_score int) int {
 	count := 0
-	for set := range find_sets_of_type(hand, PUNG+KONG) {
+	for set := range find_sets_of_type(hand, Pung+Kong) {
 		if set.Concealed {
 			count += 1
 		}
@@ -135,7 +135,7 @@ func chow_hand(hand *Hand, simple_score int) int {
 	}
 
 	count := 0
-	for _ = range find_sets_of_type(hand, CHOW) {
+	for _ = range find_sets_of_type(hand, Chow) {
 		count += 1
 	}
 
@@ -179,7 +179,7 @@ func all_terminals_honours(hand *Hand, simple_score int) int {
 }
 
 func half_flush(hand *Hand, simple_score int) int {
-	suit := NO_TILE
+	suit := NoTile
 	seen_honour := false
 
 	count := 0
@@ -189,7 +189,7 @@ func half_flush(hand *Hand, simple_score int) int {
 		switch {
 		case tile.IsHonour():
 			seen_honour = true
-		case suit == NO_TILE:
+		case suit == NoTile:
 			suit = tile.Suit()
 		case tile.Suit() != suit:
 			return 0
@@ -213,7 +213,7 @@ func outside_hand(hand *Hand, simple_score int) int {
 	nr_of_chows := 0
 	for idx, _ := range hand.Sets {
 		set := &hand.Sets[idx]
-		if set.set_type == CHOW {
+		if set.setType == Chow {
 			nr_of_chows += 1
 		}
 		if !set.HasTerminalOrHonour() {

@@ -14,7 +14,7 @@ func IsValidSet(set Set) (bool, bool) {
 	sort.Sort(ByTileOrder(set.Tiles))
 
 	first_tile := set.Tiles[0]
-	var may_chow bool = first_tile < MAY_CHOW_BELOW
+	var may_chow bool = first_tile < mayChowBelow
 
 	var is_same bool
 	var is_chow bool
@@ -45,17 +45,17 @@ func IsValidSet(set Set) (bool, bool) {
 func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
 	// TODO: count score & doubles for flowers & seasons.
 	if len(set.Tiles) < 2 {
-		set.set_type = NO_SET
+		set.setType = NoSet
 		return 0, 0, false
 	}
 
 	is_valid, is_chow := IsValidSet(*set)
 	if !is_valid {
-		set.set_type = NO_SET
+		set.setType = NoSet
 		return 0, 0, is_valid
 	}
 	if is_chow {
-		set.set_type = CHOW
+		set.setType = Chow
 		return 0, 0, is_valid
 	}
 
@@ -75,14 +75,14 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
 	// A kong scores 4 times as much as a pung.
 	if len(set.Tiles) == 4 {
 		multiplier *= 4
-		set.set_type = KONG
+		set.setType = Kong
 	} else {
-		set.set_type = PUNG
+		set.setType = Pung
 	}
 
 	switch len(set.Tiles) {
 	case 2:
-		set.set_type = PILLOW
+		set.setType = Pillow
 		switch {
 		case scoring_wind:
 			return 2, 0, true

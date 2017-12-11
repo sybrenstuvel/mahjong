@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	WIND_OWN   = WIND_NORTH
-	WIND_ROUND = WIND_WEST
+	WIND_OWN   = WindNorth
+	WIND_ROUND = WindWest
 )
 
 type ScoreTestSuite struct{}
@@ -25,16 +25,16 @@ func (s *ScoreTestSuite) TestTileValid(t *check.C) {
 		}
 	}
 
-	assert_tile_valid(false, BALLS_BASE)
+	assert_tile_valid(false, ballsBase)
 	assert_tile_valid(false, -1)
 	assert_tile_valid(false, 0xffff)
-	assert_tile_valid(true, BALLS_3)
+	assert_tile_valid(true, Balls3)
 	assert_tile_valid(true, 13)
-	assert_tile_valid(false, CHARS_1-1)
-	assert_tile_valid(false, CHARS_9+1)
-	assert_tile_valid(true, CHARS_9-1)
-	assert_tile_valid(true, BAMBOO_1+1)
-	assert_tile_valid(false, BAMBOO_1-1)
+	assert_tile_valid(false, Chars1-1)
+	assert_tile_valid(false, Chars9+1)
+	assert_tile_valid(true, Chars9-1)
+	assert_tile_valid(true, Bamboo1+1)
+	assert_tile_valid(false, Bamboo1-1)
 }
 
 func (s *ScoreTestSuite) TestSetValid(t *check.C) {
@@ -56,27 +56,27 @@ func (s *ScoreTestSuite) TestSetValid(t *check.C) {
 	}
 
 	assert_set_valid(false, false, Set{})
-	assert_set_valid(false, false, Set{Tiles: []Tile{BALLS_3, BALLS_4}, Concealed: false})
-	assert_set_valid(false, false, Set{Tiles: []Tile{BALLS_BASE}, Concealed: false})
-	assert_set_valid(false, false, Set{Tiles: []Tile{BALLS_3}, Concealed: false})
+	assert_set_valid(false, false, Set{Tiles: []Tile{Balls3, Balls4}, Concealed: false})
+	assert_set_valid(false, false, Set{Tiles: []Tile{ballsBase}, Concealed: false})
+	assert_set_valid(false, false, Set{Tiles: []Tile{Balls3}, Concealed: false})
 	assert_set_valid(false, false, Set{Tiles: []Tile{1, 2}})
-	assert_set_valid(false, false, Set{Tiles: []Tile{DRAGON_RED, DRAGON_WHITE}, Concealed: true})
-	assert_set_valid(false, false, Set{Tiles: []Tile{DRAGON_RED, DRAGON_RED, DRAGON_WHITE, DRAGON_GREEN}, Concealed: true})
-	assert_set_valid(false, false, Set{Tiles: []Tile{DRAGON_RED, DRAGON_WHITE, DRAGON_GREEN}, Concealed: true})
-	assert_set_valid(false, false, Set{Tiles: []Tile{BALLS_8, BALLS_9, BALLS_9 + 1}})
+	assert_set_valid(false, false, Set{Tiles: []Tile{DragonRed, DragonWhite}, Concealed: true})
+	assert_set_valid(false, false, Set{Tiles: []Tile{DragonRed, DragonRed, DragonWhite, DragonGreen}, Concealed: true})
+	assert_set_valid(false, false, Set{Tiles: []Tile{DragonRed, DragonWhite, DragonGreen}, Concealed: true})
+	assert_set_valid(false, false, Set{Tiles: []Tile{Balls8, Balls9, Balls9 + 1}})
 
-	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_3, BALLS_3}})
-	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_3, BALLS_3, BALLS_3}})
-	assert_set_valid(true, true, Set{Tiles: []Tile{BALLS_3, BALLS_4, BALLS_5}})
-	assert_set_valid(true, true, Set{Tiles: []Tile{BALLS_3, BALLS_5, BALLS_4}})
-	assert_set_valid(true, false, Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
-	assert_set_valid(true, false, Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
+	assert_set_valid(true, false, Set{Tiles: []Tile{Balls3, Balls3}})
+	assert_set_valid(true, false, Set{Tiles: []Tile{Balls3, Balls3, Balls3}})
+	assert_set_valid(true, true, Set{Tiles: []Tile{Balls3, Balls4, Balls5}})
+	assert_set_valid(true, true, Set{Tiles: []Tile{Balls3, Balls5, Balls4}})
+	assert_set_valid(true, false, Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite}, Concealed: true})
+	assert_set_valid(true, false, Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite, DragonWhite}, Concealed: true})
 
-	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_9, BALLS_9}})
-	assert_set_valid(true, true, Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}})
-	assert_set_valid(true, true, Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}})
-	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1, BALLS_1}})
-	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_8, BALLS_8, BALLS_8}})
+	assert_set_valid(true, false, Set{Tiles: []Tile{Balls9, Balls9}})
+	assert_set_valid(true, true, Set{Tiles: []Tile{Balls2, Balls3, Balls4}})
+	assert_set_valid(true, true, Set{Tiles: []Tile{Balls5, Balls6, Balls7}})
+	assert_set_valid(true, false, Set{Tiles: []Tile{Balls1, Balls1, Balls1, Balls1}})
+	assert_set_valid(true, false, Set{Tiles: []Tile{Balls8, Balls8, Balls8}})
 }
 
 func (s *ScoreTestSuite) TestIsDragon(t *check.C) {
@@ -86,11 +86,11 @@ func (s *ScoreTestSuite) TestIsDragon(t *check.C) {
 		}
 	}
 
-	assert(true, DRAGON_WHITE)
-	assert(true, DRAGON_GREEN)
-	assert(true, DRAGON_RED)
-	assert(false, DRAGON_BASE)
-	assert(false, DRAGON_WHITE+1)
+	assert(true, DragonWhite)
+	assert(true, DragonGreen)
+	assert(true, DragonRed)
+	assert(false, dragonBase)
+	assert(false, DragonWhite+1)
 }
 
 func (s *ScoreTestSuite) TestIsWind(t *check.C) {
@@ -100,12 +100,12 @@ func (s *ScoreTestSuite) TestIsWind(t *check.C) {
 		}
 	}
 
-	assert(true, WIND_EAST)
-	assert(true, WIND_SOUTH)
-	assert(true, WIND_WEST)
-	assert(true, WIND_NORTH)
-	assert(false, WIND_BASE)
-	assert(false, WIND_NORTH+1)
+	assert(true, WindEast)
+	assert(true, WindSouth)
+	assert(true, WindWest)
+	assert(true, WindNorth)
+	assert(false, windBase)
+	assert(false, WindNorth+1)
 }
 
 func (s *ScoreTestSuite) TestIsValid(t *check.C) {
@@ -115,14 +115,14 @@ func (s *ScoreTestSuite) TestIsValid(t *check.C) {
 		}
 	}
 
-	assert(true, WIND_EAST)
-	assert(true, BALLS_1)
-	assert(true, BALLS_9)
-	assert(true, SEASON_4)
-	assert(false, BALLS_BASE)
-	assert(false, WIND_NORTH+1)
-	assert(false, BALLS_9+1)
-	assert(false, SEASON_4+1)
+	assert(true, WindEast)
+	assert(true, Balls1)
+	assert(true, Balls9)
+	assert(true, Season4)
+	assert(false, ballsBase)
+	assert(false, WindNorth+1)
+	assert(false, Balls9+1)
+	assert(false, Season4+1)
 }
 
 func (s *ScoreTestSuite) TestSetScores(t *check.C) {
@@ -130,7 +130,7 @@ func (s *ScoreTestSuite) TestSetScores(t *check.C) {
 	assert_set_score := func(expected_score, expected_doubles int, expected_type SetType, set *Set) {
 		score, doubles, _ := ScoreSet(set, WIND_OWN, WIND_ROUND)
 
-		if score == expected_score && doubles == expected_doubles && expected_type == set.set_type {
+		if score == expected_score && doubles == expected_doubles && expected_type == set.setType {
 			return
 		}
 
@@ -141,58 +141,58 @@ func (s *ScoreTestSuite) TestSetScores(t *check.C) {
 
 		t.Errorf("Set: %s\n", as_json)
 		t.Errorf("Expected score=%v doubles=%v set_type=%v, got score=%v doubles=%v set_type=%v\n",
-			expected_score, expected_doubles, expected_type, score, doubles, set.set_type)
+			expected_score, expected_doubles, expected_type, score, doubles, set.setType)
 	}
 
 	// TODO: count score & doubles for flowers & seasons.
 
-	assert_set_score(0, 0, NO_SET, &Set{})
+	assert_set_score(0, 0, NoSet, &Set{})
 
 	// Simples: chow, pung, and kong
-	assert_set_score(0, 0, PILLOW, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_5}})
-	assert_set_score(0, 0, NO_SET, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_6}})
-	assert_set_score(0, 0, CHOW, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_6, BAMBOO_7}})
-	assert_set_score(2, 0, PUNG, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_5, BAMBOO_5}})
-	assert_set_score(4, 0, PUNG, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_5, BAMBOO_5}, Concealed: true})
-	assert_set_score(8, 0, KONG, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_5, BAMBOO_5, BAMBOO_5}})
-	assert_set_score(16, 0, KONG, &Set{Tiles: []Tile{BAMBOO_5, BAMBOO_5, BAMBOO_5, BAMBOO_5}, Concealed: true})
+	assert_set_score(0, 0, Pillow, &Set{Tiles: []Tile{Bamboo5, Bamboo5}})
+	assert_set_score(0, 0, NoSet, &Set{Tiles: []Tile{Bamboo5, Bamboo6}})
+	assert_set_score(0, 0, Chow, &Set{Tiles: []Tile{Bamboo5, Bamboo6, Bamboo7}})
+	assert_set_score(2, 0, Pung, &Set{Tiles: []Tile{Bamboo5, Bamboo5, Bamboo5}})
+	assert_set_score(4, 0, Pung, &Set{Tiles: []Tile{Bamboo5, Bamboo5, Bamboo5}, Concealed: true})
+	assert_set_score(8, 0, Kong, &Set{Tiles: []Tile{Bamboo5, Bamboo5, Bamboo5, Bamboo5}})
+	assert_set_score(16, 0, Kong, &Set{Tiles: []Tile{Bamboo5, Bamboo5, Bamboo5, Bamboo5}, Concealed: true})
 
 	// Terminals: chow, pung, and kong
-	assert_set_score(0, 0, PILLOW, &Set{Tiles: []Tile{CHARS_9, CHARS_9}})
-	assert_set_score(4, 0, PUNG, &Set{Tiles: []Tile{CHARS_9, CHARS_9, CHARS_9}})
-	assert_set_score(8, 0, PUNG, &Set{Tiles: []Tile{CHARS_9, CHARS_9, CHARS_9}, Concealed: true})
-	assert_set_score(16, 0, KONG, &Set{Tiles: []Tile{CHARS_9, CHARS_9, CHARS_9, CHARS_9}})
-	assert_set_score(32, 0, KONG, &Set{Tiles: []Tile{CHARS_9, CHARS_9, CHARS_9, CHARS_9}, Concealed: true})
+	assert_set_score(0, 0, Pillow, &Set{Tiles: []Tile{Chars9, Chars9}})
+	assert_set_score(4, 0, Pung, &Set{Tiles: []Tile{Chars9, Chars9, Chars9}})
+	assert_set_score(8, 0, Pung, &Set{Tiles: []Tile{Chars9, Chars9, Chars9}, Concealed: true})
+	assert_set_score(16, 0, Kong, &Set{Tiles: []Tile{Chars9, Chars9, Chars9, Chars9}})
+	assert_set_score(32, 0, Kong, &Set{Tiles: []Tile{Chars9, Chars9, Chars9, Chars9}, Concealed: true})
 
 	// Round winds
-	assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST}})
-	assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}})
-	assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}, Concealed: true})
-	assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST, WIND_WEST}})
-	assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST, WIND_WEST}, Concealed: true})
+	assert_set_score(2, 0, Pillow, &Set{Tiles: []Tile{WindWest, WindWest}})
+	assert_set_score(4, 1, Pung, &Set{Tiles: []Tile{WindWest, WindWest, WindWest}})
+	assert_set_score(8, 1, Pung, &Set{Tiles: []Tile{WindWest, WindWest, WindWest}, Concealed: true})
+	assert_set_score(16, 1, Kong, &Set{Tiles: []Tile{WindWest, WindWest, WindWest, WindWest}})
+	assert_set_score(32, 1, Kong, &Set{Tiles: []Tile{WindWest, WindWest, WindWest, WindWest}, Concealed: true})
 
 	// Own winds
-	assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH}})
-	assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}})
-	assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}, Concealed: true})
-	assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH, WIND_NORTH}})
-	assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH, WIND_NORTH}, Concealed: true})
+	assert_set_score(2, 0, Pillow, &Set{Tiles: []Tile{WindNorth, WindNorth}})
+	assert_set_score(4, 1, Pung, &Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth}})
+	assert_set_score(8, 1, Pung, &Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth}, Concealed: true})
+	assert_set_score(16, 1, Kong, &Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth, WindNorth}})
+	assert_set_score(32, 1, Kong, &Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth, WindNorth}, Concealed: true})
 
 	// Other winds
-	assert_set_score(0, 0, PILLOW, &Set{Tiles: []Tile{WIND_EAST, WIND_EAST}})
-	assert_set_score(0, 0, NO_SET, &Set{Tiles: []Tile{WIND_EAST, BAMBOO_6}})
-	assert_set_score(0, 0, NO_SET, &Set{Tiles: []Tile{WIND_EAST, WIND_SOUTH, WIND_WEST}})
-	assert_set_score(4, 0, PUNG, &Set{Tiles: []Tile{WIND_EAST, WIND_EAST, WIND_EAST}})
-	assert_set_score(16, 0, KONG, &Set{Tiles: []Tile{WIND_EAST, WIND_EAST, WIND_EAST, WIND_EAST}})
+	assert_set_score(0, 0, Pillow, &Set{Tiles: []Tile{WindEast, WindEast}})
+	assert_set_score(0, 0, NoSet, &Set{Tiles: []Tile{WindEast, Bamboo6}})
+	assert_set_score(0, 0, NoSet, &Set{Tiles: []Tile{WindEast, WindSouth, WindWest}})
+	assert_set_score(4, 0, Pung, &Set{Tiles: []Tile{WindEast, WindEast, WindEast}})
+	assert_set_score(16, 0, Kong, &Set{Tiles: []Tile{WindEast, WindEast, WindEast, WindEast}})
 
 	// Dragons: pillow, pung, and kong
-	assert_set_score(0, 0, NO_SET, &Set{Tiles: []Tile{DRAGON_WHITE}})
-	assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}})
-	assert_set_score(2, 0, PILLOW, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
-	assert_set_score(4, 1, PUNG, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}})
-	assert_set_score(8, 1, PUNG, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
-	assert_set_score(16, 1, KONG, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}})
-	assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
+	assert_set_score(0, 0, NoSet, &Set{Tiles: []Tile{DragonWhite}})
+	assert_set_score(2, 0, Pillow, &Set{Tiles: []Tile{DragonGreen, DragonGreen}})
+	assert_set_score(2, 0, Pillow, &Set{Tiles: []Tile{DragonWhite, DragonWhite}, Concealed: true})
+	assert_set_score(4, 1, Pung, &Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite}})
+	assert_set_score(8, 1, Pung, &Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite}, Concealed: true})
+	assert_set_score(16, 1, Kong, &Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite, DragonWhite}})
+	assert_set_score(32, 1, Kong, &Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite, DragonWhite}, Concealed: true})
 }
 
 func (s *ScoreTestSuite) TestScore(t *check.C) {
@@ -226,9 +226,9 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Two pairs of dragons and a pung of balls 1
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_RED, DRAGON_RED}},
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1}},
+		Set{Tiles: []Tile{DragonRed, DragonRed}},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
+		Set{Tiles: []Tile{Balls1, Balls1, Balls1}},
 	}}
 	assert_score(8, hand)
 	if hand.Winning {
@@ -237,9 +237,9 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Two chows and a pung of simples
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{BAMBOO_4, BAMBOO_5, BAMBOO_6}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_3, BALLS_2}},
-		Set{Tiles: []Tile{CHARS_4, CHARS_4, CHARS_4}},
+		Set{Tiles: []Tile{Bamboo4, Bamboo5, Bamboo6}},
+		Set{Tiles: []Tile{Balls1, Balls3, Balls2}},
+		Set{Tiles: []Tile{Chars4, Chars4, Chars4}},
 	}}
 	assert_score(2, hand)
 	if hand.Winning {
@@ -248,8 +248,8 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Kong of dragons and a concealed pung of simples
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN, DRAGON_GREEN, DRAGON_GREEN}},
-		Set{Tiles: []Tile{CHARS_4, CHARS_4, CHARS_4}, Concealed: true},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}},
+		Set{Tiles: []Tile{Chars4, Chars4, Chars4}, Concealed: true},
 	}}
 	assert_score(40, hand)
 	if hand.Winning {
@@ -258,11 +258,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning hand with no doubles.
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{BALLS_9, BALLS_9}},
-		Set{Tiles: []Tile{BAMBOO_2, BAMBOO_3, BAMBOO_4}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1, BALLS_1}},
-		Set{Tiles: []Tile{BALLS_8, BALLS_8, BALLS_8}},
+		Set{Tiles: []Tile{Balls9, Balls9}},
+		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
+		Set{Tiles: []Tile{Balls1, Balls1, Balls1, Balls1}},
+		Set{Tiles: []Tile{Balls8, Balls8, Balls8}},
 	}}
 	assert_score(16+2+20, hand)
 	if !hand.Winning {
@@ -274,11 +274,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning hand with full flush
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{BALLS_9, BALLS_9}},
-		Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1, BALLS_1}},
-		Set{Tiles: []Tile{BALLS_8, BALLS_8, BALLS_8}},
+		Set{Tiles: []Tile{Balls9, Balls9}},
+		Set{Tiles: []Tile{Balls2, Balls3, Balls4}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
+		Set{Tiles: []Tile{Balls1, Balls1, Balls1, Balls1}},
+		Set{Tiles: []Tile{Balls8, Balls8, Balls8}},
 	}}
 	if full_flush(hand, 38) == 0 {
 		t.Error("Hand should be detected as full flush")
@@ -290,11 +290,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning hand with pure straight
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},
-		Set{Tiles: []Tile{BALLS_7, BALLS_8, BALLS_9}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_3, BALLS_2}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_4}},
-		Set{Tiles: []Tile{BAMBOO_8, BAMBOO_8, BAMBOO_8}},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
+		Set{Tiles: []Tile{Balls7, Balls8, Balls9}},
+		Set{Tiles: []Tile{Balls1, Balls3, Balls2}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls4}},
+		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
 	assert_score((2+2+20)*2, hand) // 48
 	if !hand.Winning {
@@ -303,11 +303,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Non-winning hand with pure straight
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN}},
-		Set{Tiles: []Tile{BALLS_7, BALLS_8, BALLS_9}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_3, BALLS_2}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_4}},
-		Set{Tiles: []Tile{BAMBOO_8, BAMBOO_8, BAMBOO_8}},
+		Set{Tiles: []Tile{DragonGreen}},
+		Set{Tiles: []Tile{Balls7, Balls8, Balls9}},
+		Set{Tiles: []Tile{Balls1, Balls3, Balls2}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls4}},
+		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
 	assert_score(4, hand)
 	if hand.Winning {
@@ -316,11 +316,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning hand with all pungs
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},
-		Set{Tiles: []Tile{BALLS_7, BALLS_7, BALLS_7}},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_5, BALLS_5}},
-		Set{Tiles: []Tile{BAMBOO_8, BAMBOO_8, BAMBOO_8}},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
+		Set{Tiles: []Tile{Balls7, Balls7, Balls7}},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}},
+		Set{Tiles: []Tile{Balls5, Balls5, Balls5}},
+		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
 	assert_score((2+8+20)*2, hand) // 60
 	if all_pungs(hand, 60) == 0 {
@@ -332,11 +332,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Non-winning hand with three concealed pungs
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},
-		Set{Tiles: []Tile{BALLS_7, BALLS_7, BALLS_7}, Concealed: true},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}, Concealed: true},
-		Set{Tiles: []Tile{BALLS_5, BALLS_5, BALLS_5, BALLS_5}, Concealed: true},
-		Set{Tiles: []Tile{BAMBOO_1, BAMBOO_2, BAMBOO_3}},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
+		Set{Tiles: []Tile{Balls7, Balls7, Balls7}, Concealed: true},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}, Concealed: true},
+		Set{Tiles: []Tile{Balls5, Balls5, Balls5, Balls5}, Concealed: true},
+		Set{Tiles: []Tile{Bamboo1, Bamboo2, Bamboo3}},
 	}}
 	assert_score((2+4+4+16+20)*2, hand) // 92
 	if three_concealed_pungs(hand, 92) == 0 {
@@ -348,11 +348,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning chow hand
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{BALLS_2, BALLS_2}},
-		Set{Tiles: []Tile{BALLS_1, BALLS_2, BALLS_3}},
-		Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
-		Set{Tiles: []Tile{BAMBOO_1, BAMBOO_2, BAMBOO_3}},
+		Set{Tiles: []Tile{Balls2, Balls2}},
+		Set{Tiles: []Tile{Balls1, Balls2, Balls3}},
+		Set{Tiles: []Tile{Chars1, Chars2, Chars3}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
+		Set{Tiles: []Tile{Bamboo1, Bamboo2, Bamboo3}},
 	}}
 	assert_score(40, hand)
 	if chow_hand(hand, 20) == 0 {
@@ -364,11 +364,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning all-simples hand
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{BALLS_2, BALLS_2}},
-		Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
-		Set{Tiles: []Tile{BAMBOO_2, BAMBOO_3, BAMBOO_4}},
+		Set{Tiles: []Tile{Balls2, Balls2}},
+		Set{Tiles: []Tile{Balls2, Balls3, Balls4}},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
+		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
 	}}
 	assert_score(22*2, hand)
 	if all_simples(hand, 44) == 0 {
@@ -377,12 +377,12 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// None-winning all-simples hand
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{CHARS_6}},
-		Set{Tiles: []Tile{BALLS_2}},
-		Set{Tiles: []Tile{BALLS_2, BALLS_3, BALLS_4}},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}},
-		Set{Tiles: []Tile{BALLS_5, BALLS_6, BALLS_7}},
-		Set{Tiles: []Tile{BAMBOO_2, BAMBOO_3, BAMBOO_4}},
+		Set{Tiles: []Tile{Chars6}},
+		Set{Tiles: []Tile{Balls2}},
+		Set{Tiles: []Tile{Balls2, Balls3, Balls4}},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}},
+		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
+		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
 	}}
 	assert_score(4, hand)
 	if all_simples(hand, 4) == 0 {
@@ -391,12 +391,12 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// None-winning terminals & honours hand
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN}},
-		Set{Tiles: []Tile{WIND_EAST}},
-		Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}},    // 4 + 1d
-		Set{Tiles: []Tile{CHARS_1, CHARS_1, CHARS_1}},          // 4
-		Set{Tiles: []Tile{WIND_NORTH, WIND_NORTH, WIND_NORTH}}, // 4 + 1d
-		Set{Tiles: []Tile{BAMBOO_9, BAMBOO_9, BAMBOO_9}},       // 4
+		Set{Tiles: []Tile{DragonGreen}},
+		Set{Tiles: []Tile{WindEast}},
+		Set{Tiles: []Tile{WindWest, WindWest, WindWest}},    // 4 + 1d
+		Set{Tiles: []Tile{Chars1, Chars1, Chars1}},          // 4
+		Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth}}, // 4 + 1d
+		Set{Tiles: []Tile{Bamboo9, Bamboo9, Bamboo9}},       // 4
 	}}
 	assert_score(16*8, hand)
 	if all_terminals_honours(hand, 128) == 0 {
@@ -405,11 +405,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Winning half-flush
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN, DRAGON_GREEN}},      // 2
-		Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
-		Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
-		Set{Tiles: []Tile{CHARS_4, CHARS_5, CHARS_6}},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}}, // 2
+		Set{Tiles: []Tile{DragonGreen, DragonGreen}},     // 2
+		Set{Tiles: []Tile{WindWest, WindWest, WindWest}}, // 4 + 1d
+		Set{Tiles: []Tile{Chars1, Chars2, Chars3}},
+		Set{Tiles: []Tile{Chars4, Chars5, Chars6}},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}}, // 2
 	}}
 	assert_score((20+2+4+2)*4, hand) // 56
 	if half_flush(hand, 56) == 0 {
@@ -418,12 +418,12 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Non-winning half-flush
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{DRAGON_GREEN}},
-		Set{Tiles: []Tile{WIND_EAST}},
-		Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
-		Set{Tiles: []Tile{CHARS_1, CHARS_2, CHARS_3}},
-		Set{Tiles: []Tile{CHARS_4, CHARS_5, CHARS_6}},
-		Set{Tiles: []Tile{CHARS_2, CHARS_2, CHARS_2}}, // 2
+		Set{Tiles: []Tile{DragonGreen}},
+		Set{Tiles: []Tile{WindEast}},
+		Set{Tiles: []Tile{WindWest, WindWest, WindWest}}, // 4 + 1d
+		Set{Tiles: []Tile{Chars1, Chars2, Chars3}},
+		Set{Tiles: []Tile{Chars4, Chars5, Chars6}},
+		Set{Tiles: []Tile{Chars2, Chars2, Chars2}}, // 2
 	}}
 	assert_score(24, hand)
 	if half_flush(hand, 24) == 0 {
@@ -432,11 +432,11 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	// Outside hand
 	hand = &Hand{Sets: []Set{
-		Set{Tiles: []Tile{WIND_EAST, WIND_EAST}},
-		Set{Tiles: []Tile{WIND_WEST, WIND_WEST, WIND_WEST}}, // 4 + 1d
-		Set{Tiles: []Tile{CHARS_3, CHARS_2, CHARS_1}},
-		Set{Tiles: []Tile{BAMBOO_9, BAMBOO_9, BAMBOO_9}}, // 4
-		Set{Tiles: []Tile{BALLS_1, BALLS_1, BALLS_1}},    // 4
+		Set{Tiles: []Tile{WindEast, WindEast}},
+		Set{Tiles: []Tile{WindWest, WindWest, WindWest}}, // 4 + 1d
+		Set{Tiles: []Tile{Chars3, Chars2, Chars1}},
+		Set{Tiles: []Tile{Bamboo9, Bamboo9, Bamboo9}}, // 4
+		Set{Tiles: []Tile{Balls1, Balls1, Balls1}},    // 4
 	}}
 	assert_score((20+4+4+4)*4, hand) // 128
 	if outside_hand(hand, 128) == 0 {
@@ -452,12 +452,12 @@ func (s *ScoreTestSuite) TestTile_Suit(t *check.C) {
 		}
 	}
 
-	assert(BAMBOO_BASE, BAMBOO_1)
-	assert(BAMBOO_BASE, BAMBOO_9)
-	assert(BALLS_BASE, BALLS_1)
-	assert(BALLS_BASE, BALLS_9)
-	assert(CHARS_BASE, CHARS_1)
-	assert(CHARS_BASE, CHARS_9)
-	assert(NO_TILE, BAMBOO_9+1)
-	assert(NO_TILE, SEASON_3)
+	assert(bambooBase, Bamboo1)
+	assert(bambooBase, Bamboo9)
+	assert(ballsBase, Balls1)
+	assert(ballsBase, Balls9)
+	assert(charsBase, Chars1)
+	assert(charsBase, Chars9)
+	assert(NoTile, Bamboo9+1)
+	assert(NoTile, Season3)
 }

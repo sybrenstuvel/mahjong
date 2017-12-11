@@ -2,144 +2,162 @@ package score
 
 import "encoding/json"
 
+// Tile represents a single MJ tile
 type Tile int
 
+// This block contains all possible tiles in the MJ game.
+// They are grouped by suit.
 const (
-	NO_TILE Tile = 0
+	NoTile Tile = 0
 
 	// Balls 11-19
-	BALLS_BASE Tile = 10
-	BALLS_1    Tile = BALLS_BASE + 1
-	BALLS_2    Tile = BALLS_BASE + 2
-	BALLS_3    Tile = BALLS_BASE + 3
-	BALLS_4    Tile = BALLS_BASE + 4
-	BALLS_5    Tile = BALLS_BASE + 5
-	BALLS_6    Tile = BALLS_BASE + 6
-	BALLS_7    Tile = BALLS_BASE + 7
-	BALLS_8    Tile = BALLS_BASE + 8
-	BALLS_9    Tile = BALLS_BASE + 9
+	ballsBase Tile = 10
+	Balls1    Tile = ballsBase + 1
+	Balls2    Tile = ballsBase + 2
+	Balls3    Tile = ballsBase + 3
+	Balls4    Tile = ballsBase + 4
+	Balls5    Tile = ballsBase + 5
+	Balls6    Tile = ballsBase + 6
+	Balls7    Tile = ballsBase + 7
+	Balls8    Tile = ballsBase + 8
+	Balls9    Tile = ballsBase + 9
 
 	// Characters 21-29
-	CHARS_BASE Tile = 20
-	CHARS_1    Tile = CHARS_BASE + 1
-	CHARS_2    Tile = CHARS_BASE + 2
-	CHARS_3    Tile = CHARS_BASE + 3
-	CHARS_4    Tile = CHARS_BASE + 4
-	CHARS_5    Tile = CHARS_BASE + 5
-	CHARS_6    Tile = CHARS_BASE + 6
-	CHARS_7    Tile = CHARS_BASE + 7
-	CHARS_8    Tile = CHARS_BASE + 8
-	CHARS_9    Tile = CHARS_BASE + 9
+	charsBase Tile = 20
+	Chars1    Tile = charsBase + 1
+	Chars2    Tile = charsBase + 2
+	Chars3    Tile = charsBase + 3
+	Chars4    Tile = charsBase + 4
+	Chars5    Tile = charsBase + 5
+	Chars6    Tile = charsBase + 6
+	Chars7    Tile = charsBase + 7
+	Chars8    Tile = charsBase + 8
+	Chars9    Tile = charsBase + 9
 
 	// Bamboo 31-39
-	BAMBOO_BASE Tile = 30
-	BAMBOO_1    Tile = BAMBOO_BASE + 1
-	BAMBOO_2    Tile = BAMBOO_BASE + 2
-	BAMBOO_3    Tile = BAMBOO_BASE + 3
-	BAMBOO_4    Tile = BAMBOO_BASE + 4
-	BAMBOO_5    Tile = BAMBOO_BASE + 5
-	BAMBOO_6    Tile = BAMBOO_BASE + 6
-	BAMBOO_7    Tile = BAMBOO_BASE + 7
-	BAMBOO_8    Tile = BAMBOO_BASE + 8
-	BAMBOO_9    Tile = BAMBOO_BASE + 9
+	bambooBase Tile = 30
+	Bamboo1    Tile = bambooBase + 1
+	Bamboo2    Tile = bambooBase + 2
+	Bamboo3    Tile = bambooBase + 3
+	Bamboo4    Tile = bambooBase + 4
+	Bamboo5    Tile = bambooBase + 5
+	Bamboo6    Tile = bambooBase + 6
+	Bamboo7    Tile = bambooBase + 7
+	Bamboo8    Tile = bambooBase + 8
+	Bamboo9    Tile = bambooBase + 9
 
-	MAY_CHOW_BELOW = BAMBOO_9 + 1
+	mayChowBelow = Bamboo9 + 1
 
 	// Winds 41-44
-	WIND_BASE  Tile = 40
-	WIND_EAST  Tile = WIND_BASE + 1
-	WIND_SOUTH Tile = WIND_BASE + 2
-	WIND_WEST  Tile = WIND_BASE + 3
-	WIND_NORTH Tile = WIND_BASE + 4
+	windBase  Tile = 40
+	WindEast  Tile = windBase + 1
+	WindSouth Tile = windBase + 2
+	WindWest  Tile = windBase + 3
+	WindNorth Tile = windBase + 4
 
 	// Dragons 51-54
-	DRAGON_BASE  Tile = 50
-	DRAGON_RED   Tile = DRAGON_BASE + 1
-	DRAGON_GREEN Tile = DRAGON_BASE + 2
-	DRAGON_WHITE Tile = DRAGON_BASE + 3
+	dragonBase  Tile = 50
+	DragonRed   Tile = dragonBase + 1
+	DragonGreen Tile = dragonBase + 2
+	DragonWhite Tile = dragonBase + 3
 
 	// Flowers 61-64
-	FLOWER_BASE Tile = 60
-	FLOWER_1    Tile = FLOWER_BASE + 1
-	FLOWER_2    Tile = FLOWER_BASE + 2
-	FLOWER_3    Tile = FLOWER_BASE + 3
-	FLOWER_4    Tile = FLOWER_BASE + 4
+	flowerBase Tile = 60
+	Flower1    Tile = flowerBase + 1
+	Flower2    Tile = flowerBase + 2
+	Flower3    Tile = flowerBase + 3
+	Flower4    Tile = flowerBase + 4
 
 	// Seasons 71-74
-	SEASON_BASE Tile = 70
-	SEASON_1    Tile = SEASON_BASE + 1
-	SEASON_2    Tile = SEASON_BASE + 2
-	SEASON_3    Tile = SEASON_BASE + 3
-	SEASON_4    Tile = SEASON_BASE + 4
+	seasonBase Tile = 70
+	Season1    Tile = seasonBase + 1
+	Season2    Tile = seasonBase + 2
+	Season3    Tile = seasonBase + 3
+	Season4    Tile = seasonBase + 4
 )
 
-func (tile *Tile) IsValid() bool {
-	if *tile < MAY_CHOW_BELOW {
-		modulo := int(*tile) % 10
+// IsValid returns true if the number of the tile represents a valid tile.
+func (tile Tile) IsValid() bool {
+	if tile < mayChowBelow {
+		modulo := int(tile) % 10
 		return 1 <= modulo && modulo <= 9
 	}
 
 	return tile.IsHonour() || tile.IsFlower() || tile.IsSeason()
 }
 
-func (tile *Tile) MarshalJSON() ([]byte, error) {
+// MarshalJSON converts a tile to JSON.
+func (tile Tile) MarshalJSON() ([]byte, error) {
 	return json.Marshal(tile.String())
 }
 
+// IsWind returns true for wind tiles.
 func (tile Tile) IsWind() bool {
-	return tile > WIND_BASE && tile-WIND_BASE <= 4
+	return tile > windBase && tile-windBase <= 4
 }
 
+// IsDragon returns true for dragon tiles.
 func (tile Tile) IsDragon() bool {
-	return tile > DRAGON_BASE && tile-DRAGON_BASE <= 3
+	return tile > dragonBase && tile-dragonBase <= 3
 }
 
+// IsFlower returns true for flower tiles.
 func (tile Tile) IsFlower() bool {
-	return tile > FLOWER_BASE && tile-FLOWER_BASE <= 4
+	return tile > flowerBase && tile-flowerBase <= 4
 }
 
+// IsSeason returns true for season tiles.
 func (tile Tile) IsSeason() bool {
-	return tile > SEASON_BASE && tile-SEASON_BASE <= 4
+	return tile > seasonBase && tile-seasonBase <= 4
 }
 
+// IsHonour returns true for honour tiles.
 func (tile Tile) IsHonour() bool {
 	return tile.IsDragon() || tile.IsWind()
 }
 
+// IsTerminal returns true for terminal tiles.
 func (tile Tile) IsTerminal() bool {
 	number := int(tile) % 10
-	return tile < MAY_CHOW_BELOW && (number == 1 || number == 9)
+	return tile < mayChowBelow && (number == 1 || number == 9)
 }
 
+// IsSimple returns true for simple tiles.
 func (tile Tile) IsSimple() bool {
 	number := int(tile) % 10
-	return tile < MAY_CHOW_BELOW && number > 1 && number < 9
+	return tile < mayChowBelow && number > 1 && number < 9
 }
 
+// Suit returns the suit base number of the tile.
+// By itself it's rather worthless, but it does allow comparison of suits between tiles.
 func (tile Tile) Suit() Tile {
-	if tile >= MAY_CHOW_BELOW {
-		return NO_TILE
+	if tile >= mayChowBelow {
+		return NoTile
 	}
 
 	number := int(tile) % 10
 	return Tile(int(tile) - number)
 }
 
+// Number returns the number of the tile (like 9 for a bamboo-9),
+// or 0 if the tile has no number (like a red dragon or flower).
+// A chow consists of sequential tiles for which this function
+// returns a non-zero number.
 func (tile Tile) Number() int {
-	if tile >= MAY_CHOW_BELOW {
+	if tile >= mayChowBelow {
 		return 0
 	}
 	return int(tile) % 10
 }
 
-// implements sort.Interface for []Tile based on tile order.
+// ByTileOrder implements sort.Interface for []Tile based on tile order.
 type ByTileOrder []Tile
 
 func (a ByTileOrder) Len() int           { return len(a) }
 func (a ByTileOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTileOrder) Less(i, j int) bool { return a[i] < a[j] }
 
-// implements sort.Interface for []Set based on tile order.
+// SortSetsByTileOrder implements sort.Interface for []Set based on tile order.
 type SortSetsByTileOrder []Set
 
 func (a SortSetsByTileOrder) Len() int      { return len(a) }
@@ -166,23 +184,26 @@ func (a SortSetsByTileOrder) Less(i, j int) bool {
 	return a[i].Tiles[0] < a[j].Tiles[0]
 }
 
+// SetType represents a type of set, see the constants defined below.
 type SetType int
 
+// Constants indicating the type of set.
 const (
-	NO_SET = 0
-	PILLOW = 1
-	CHOW   = 2
-	PUNG   = 4
-	KONG   = 8
+	NoSet  SetType = 0
+	Pillow SetType = 1
+	Chow   SetType = 2
+	Pung   SetType = 4
+	Kong   SetType = 8
 )
 
-// A set consists of one to four tiles.
+// Set consists of one to four tiles.
 type Set struct {
 	Tiles     []Tile
 	Concealed bool
-	set_type  SetType
+	setType   SetType
 }
 
+// HasTerminalOrHonour returns true if the set contains a terminal or an honour.
 func (set *Set) HasTerminalOrHonour() bool {
 	for _, tile := range set.Tiles {
 		if tile.IsTerminal() || tile.IsHonour() {
@@ -192,6 +213,7 @@ func (set *Set) HasTerminalOrHonour() bool {
 	return false
 }
 
+// Hand represents a hand (which may be non-winning) and consistst of sets and win conditions.
 type Hand struct {
 	Sets                 []Set
 	WindOwn              Tile

@@ -86,6 +86,9 @@ var (
 
 // IsValid returns true if the number of the tile represents a valid tile.
 func (tile Tile) IsValid() bool {
+	if tile <= ballsBase {
+		return false
+	}
 	if tile < mayChowBelow {
 		modulo := int(tile) % 10
 		return 1 <= modulo && modulo <= 9
@@ -96,6 +99,9 @@ func (tile Tile) IsValid() bool {
 
 // MarshalJSON converts a tile to JSON.
 func (tile Tile) MarshalJSON() ([]byte, error) {
+	if !tile.IsValid() {
+		return []byte{}, ErrTileNotValid
+	}
 	return json.Marshal(int(tile))
 }
 
@@ -219,8 +225,8 @@ const (
 
 // Set consists of one to four tiles.
 type Set struct {
-	Tiles     []Tile
-	Concealed bool
+	Tiles     []Tile `json:"tiles"`
+	Concealed bool   `json:"concealed"`
 	setType   SetType
 }
 
@@ -236,14 +242,14 @@ func (set *Set) HasTerminalOrHonour() bool {
 
 // Hand represents a hand (which may be non-winning) and consistst of sets and win conditions.
 type Hand struct {
-	Sets                 []Set
-	WindOwn              Tile
-	WindRound            Tile
-	LastChance           bool
-	WinSelfDrawn         bool
-	WinOnReplacementTile bool
-	LastTileOfWall       bool
-	RobbedTheKong        bool
-	OutInDraw            bool
-	Winning              bool
+	Sets                 []Set `json:"sets"`
+	WindOwn              Tile  `json:"wind_own"`
+	WindRound            Tile  `json:"wind_round"`
+	LastChance           bool  `json:"last_chance"`
+	WinSelfDrawn         bool  `json:"win_self_drawn"`
+	WinOnReplacementTile bool  `json:"win_on_replacement_tile"`
+	LastTileOfWall       bool  `json:"last_tile_of_wall"`
+	RobbedTheKong        bool  `json:"robbed_the_kong"`
+	OutInDraw            bool  `json:"out_in_draw"`
+	Winning              bool  `json:"winning"`
 }

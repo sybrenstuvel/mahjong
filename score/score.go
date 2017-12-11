@@ -4,8 +4,8 @@ import (
 	"sort"
 )
 
-// Returns (is valid, is chow)
-func IsValidSet(set Set) (bool, bool) {
+// IsValid returns (is valid, is chow) for this set.
+func (set *Set) IsValid() (bool, bool) {
 	if len(set.Tiles) < 2 || len(set.Tiles) > 4 {
 		return false, false
 	}
@@ -13,11 +13,11 @@ func IsValidSet(set Set) (bool, bool) {
 	// Sorting is needed to determine chows.
 	sort.Sort(ByTileOrder(set.Tiles))
 
-	first_tile := set.Tiles[0]
-	var may_chow bool = first_tile < mayChowBelow
+	firstTile := set.Tiles[0]
+	mayChow := firstTile < mayChowBelow
 
-	var is_same bool
-	var is_chow bool
+	var isSame bool
+	var isChow bool
 
 	for idx, tile := range set.Tiles {
 		if !tile.IsValid() {
@@ -25,15 +25,15 @@ func IsValidSet(set Set) (bool, bool) {
 		}
 
 		// Either all tiles should be the same, or sequential.
-		is_same = tile == first_tile
-		is_chow = may_chow && int(tile) == int(first_tile)+idx
+		isSame = tile == firstTile
+		isChow = mayChow && int(tile) == int(firstTile)+idx
 
-		if !is_same && !is_chow {
+		if !isSame && !isChow {
 			return false, false
 		}
 	}
 
-	if is_chow {
+	if isChow {
 		valid := len(set.Tiles) == 3
 		return valid, valid
 	}
@@ -41,28 +41,29 @@ func IsValidSet(set Set) (bool, bool) {
 	return true, false
 }
 
-// Returns (score, doubles, valid)
-func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
+// Score returns (basic score, doubles, valid) for the given set.
+// The returned 'basic' score is not yet multiplied by the doubles.
+func (set *Set) Score(windOwn, windRound Tile) (int, int, bool) {
 	// TODO: count score & doubles for flowers & seasons.
 	if len(set.Tiles) < 2 {
 		set.setType = NoSet
 		return 0, 0, false
 	}
 
-	is_valid, is_chow := IsValidSet(*set)
-	if !is_valid {
+	isValid, isChow := set.IsValid()
+	if !isValid {
 		set.setType = NoSet
-		return 0, 0, is_valid
+		return 0, 0, false
 	}
-	if is_chow {
+	if isChow {
 		set.setType = Chow
-		return 0, 0, is_valid
+		return 0, 0, true
 	}
 
 	// If we're here, we know it's a pillow/pung/kong, so the
 	// length and first tile determine the score.
 	tile := set.Tiles[0]
-	scoring_wind := tile == wind_own || tile == wind_round
+	scoringWind := tile == windOwn || tile == windRound
 
 	// A concealed pung/kong scores double
 	var multiplier int
@@ -84,7 +85,7 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
 	case 2:
 		set.setType = Pillow
 		switch {
-		case scoring_wind:
+		case scoringWind:
 			return 2, 0, true
 		case tile.IsDragon():
 			return 2, 0, true
@@ -97,7 +98,7 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
 			return 4 * multiplier, 0, true
 		case tile.IsWind():
 			var double int
-			if scoring_wind {
+			if scoringWind {
 				double = 1
 			} else {
 				double = 0
@@ -113,39 +114,39 @@ func ScoreSet(set *Set, wind_own, wind_round Tile) (int, int, bool) {
 	panic("Impossible situation turned out to be possible after all.")
 }
 
-// Returns the score for the given hand.
+// Score calculates the score for the given hand.
 func Score(hand *Hand) int {
-	total_score := 0
-	total_doubles := 0
-	nr_of_pungs := 0
-	nr_of_pillows := 0
+	totalScore := 0
+	totalDoubles := 0
+	nrOfPungs := 0
+	nrOfPillows := 0
 
 	// Sorting the sets makes it easier to detect pure straights, nine gates and others.
 	sort.Sort(SortSetsByTileOrder(hand.Sets))
 
 	// Start by summing up the tile set scores.
-	for idx, _ := range hand.Sets {
+	for idx := range hand.Sets {
 		set := &hand.Sets[idx]
-		set_score, set_doubles, is_valid := ScoreSet(set, hand.WindOwn, hand.WindRound)
+		setScore, setDoubles, isValid := set.Score(hand.WindOwn, hand.WindRound)
 
-		if !is_valid {
+		if !isValid {
 			continue
 		}
 
 		switch len(set.Tiles) {
 		case 2:
-			nr_of_pillows += 1
+			nrOfPillows++
 		case 3, 4:
-			nr_of_pungs += 1
+			nrOfPungs++
 		}
 
-		total_score += set_score
-		total_doubles += set_doubles
+		totalScore += setScore
+		totalDoubles += setDoubles
 	}
 
 	// Detect winning hand
-	if nr_of_pungs == 4 && nr_of_pillows == 1 {
-		total_score += 20
+	if nrOfPungs == 4 && nrOfPillows == 1 {
+		totalScore += 20
 		hand.Winning = true
 	} else {
 		hand.Winning = false
@@ -153,8 +154,8 @@ func Score(hand *Hand) int {
 
 	// Count doubles
 	for _, detector := range detectors {
-		total_doubles += detector(hand, total_score)
+		totalDoubles += detector(hand, totalScore)
 	}
 
-	return total_score * 1 << uint(total_doubles)
+	return totalScore * 1 << uint(totalDoubles)
 }

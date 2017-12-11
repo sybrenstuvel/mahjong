@@ -2,7 +2,8 @@ package score
 
 import (
 	"encoding/json"
-	"testing"
+
+	check "gopkg.in/check.v1"
 )
 
 const (
@@ -10,8 +11,11 @@ const (
 	WIND_ROUND = WIND_WEST
 )
 
-func TestTileValid(t *testing.T) {
+type ScoreTestSuite struct{}
 
+var _ = check.Suite(&ScoreTestSuite{})
+
+func (s *ScoreTestSuite) TestTileValid(t *check.C) {
 	assert_tile_valid := func(expected_validity bool, tile Tile) {
 		validity := tile.IsValid()
 
@@ -33,7 +37,7 @@ func TestTileValid(t *testing.T) {
 	assert_tile_valid(false, BAMBOO_1-1)
 }
 
-func TestSetValid(t *testing.T) {
+func (s *ScoreTestSuite) TestSetValid(t *check.C) {
 	assert_set_valid := func(expected_validity, expected_chow bool, set Set) {
 		validity, is_chow := IsValidSet(set)
 
@@ -75,7 +79,7 @@ func TestSetValid(t *testing.T) {
 	assert_set_valid(true, false, Set{Tiles: []Tile{BALLS_8, BALLS_8, BALLS_8}})
 }
 
-func TestIsDragon(t *testing.T) {
+func (s *ScoreTestSuite) TestIsDragon(t *check.C) {
 	assert := func(is_dragon bool, dragon Tile) {
 		if is_dragon != dragon.IsDragon() {
 			t.Fatalf("%v is not correctly classified as dragon", dragon)
@@ -89,7 +93,7 @@ func TestIsDragon(t *testing.T) {
 	assert(false, DRAGON_WHITE+1)
 }
 
-func TestIsWind(t *testing.T) {
+func (s *ScoreTestSuite) TestIsWind(t *check.C) {
 	assert := func(is_wind bool, wind Tile) {
 		if is_wind != wind.IsWind() {
 			t.Fatalf("%v is not correctly classified as wind", wind)
@@ -104,7 +108,7 @@ func TestIsWind(t *testing.T) {
 	assert(false, WIND_NORTH+1)
 }
 
-func TestIsValid(t *testing.T) {
+func (s *ScoreTestSuite) TestIsValid(t *check.C) {
 	assert := func(is_valid bool, valid Tile) {
 		if is_valid != valid.IsValid() {
 			t.Fatalf("%v is not correctly classified as valid", valid)
@@ -121,7 +125,7 @@ func TestIsValid(t *testing.T) {
 	assert(false, SEASON_4+1)
 }
 
-func TestSetScores(t *testing.T) {
+func (s *ScoreTestSuite) TestSetScores(t *check.C) {
 
 	assert_set_score := func(expected_score, expected_doubles int, expected_type SetType, set *Set) {
 		score, doubles, _ := ScoreSet(set, WIND_OWN, WIND_ROUND)
@@ -191,7 +195,7 @@ func TestSetScores(t *testing.T) {
 	assert_set_score(32, 1, KONG, &Set{Tiles: []Tile{DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE, DRAGON_WHITE}, Concealed: true})
 }
 
-func TestScore(t *testing.T) {
+func (s *ScoreTestSuite) TestScore(t *check.C) {
 
 	assert_score := func(expected_score int, hand *Hand) {
 		hand.WindRound = WIND_ROUND
@@ -440,7 +444,7 @@ func TestScore(t *testing.T) {
 	}
 }
 
-func TestTile_Suit(t *testing.T) {
+func (s *ScoreTestSuite) TestTile_Suit(t *check.C) {
 	assert := func(expect_suit, tile Tile) {
 		if tile.Suit() != expect_suit {
 			t.Errorf("Tile %q doesn't have expected suit %q but %q",

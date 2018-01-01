@@ -195,34 +195,34 @@ func (s *ScoreTestSuite) TestSetScores(t *check.C) {
 	assertSetScore(32, 1, Kong, &Set{Tiles: []Tile{DragonWhite, DragonWhite, DragonWhite, DragonWhite}, Concealed: true})
 }
 
-func (s *ScoreTestSuite) TestScore(t *check.C) {
+func assertScore(t *check.C, expectedScore int, hand *Hand) {
+	hand.WindRound = windRound
+	hand.WindOwn = windOwn
+	score := Score(hand)
 
-	assertScore := func(expected_score int, hand *Hand) {
-		hand.WindRound = windRound
-		hand.WindOwn = windOwn
-		score := Score(hand)
-
-		if score == expected_score {
-			return
-		}
-
-		asJSON, err := json.Marshal(hand)
-		if err != nil {
-			t.Fatalf("Unable to marshall hand: %v", err)
-		}
-
-		t.Errorf("Hand: %s\n", asJSON)
-		t.Errorf("Expected score=%v, got score=%v\n", expected_score, score)
+	if score == expectedScore {
+		return
 	}
 
-	var hand *Hand
+	asJSON, err := json.Marshal(hand)
+	if err != nil {
+		t.Fatalf("Unable to marshall hand: %v", err)
+	}
 
-	// Empty hand
-	hand = &Hand{}
-	assertScore(0, hand)
+	t.Errorf("Hand: %s\n", asJSON)
+	t.Errorf("Expected score=%v, got score=%v\n", expectedScore, score)
+}
+
+func (s *ScoreTestSuite) TestScoreEmptyHand(t *check.C) {
+	hand := &Hand{}
+	assertScore(t, 0, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
+}
+
+func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
+	var hand *Hand
 
 	// Two pairs of dragons and a pung of balls 1
 	hand = &Hand{Sets: []Set{
@@ -230,7 +230,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
 		Set{Tiles: []Tile{Balls1, Balls1, Balls1}},
 	}}
-	assertScore(8, hand)
+	assertScore(t, 8, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
@@ -241,7 +241,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls1, Balls3, Balls2}},
 		Set{Tiles: []Tile{Chars4, Chars4, Chars4}},
 	}}
-	assertScore(2, hand)
+	assertScore(t, 2, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
@@ -251,7 +251,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}},
 		Set{Tiles: []Tile{Chars4, Chars4, Chars4}, Concealed: true},
 	}}
-	assertScore(40, hand)
+	assertScore(t, 40, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
@@ -261,7 +261,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls1, Balls2, Balls3}, Concealed: false},
 		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}, Concealed: true},
 	}}
-	assertScore(64, hand)
+	assertScore(t, 64, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
@@ -274,7 +274,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls1, Balls1, Balls1, Balls1}},
 		Set{Tiles: []Tile{Balls8, Balls8, Balls8}},
 	}}
-	assertScore(16+2+20, hand)
+	assertScore(t, 16+2+20, hand)
 	if !hand.Winning {
 		t.Error("Hand should have been recognised as winning.")
 	}
@@ -293,7 +293,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 	if fullFlush(hand, 38) == 0 {
 		t.Error("Hand should be detected as full flush")
 	}
-	assertScore((16+2+20)*(1<<4), hand) // 608
+	assertScore(t, (16+2+20)*(1<<4), hand) // 608
 	if !hand.Winning {
 		t.Error("Hand should have been recognised as winning.")
 	}
@@ -306,7 +306,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls6, Balls4}},
 		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
-	assertScore((2+2+20)*2, hand) // 48
+	assertScore(t, (2+2+20)*2, hand) // 48
 	if !hand.Winning {
 		t.Error("Hand should have been recognised as winning.")
 	}
@@ -319,7 +319,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls6, Balls4}},
 		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
-	assertScore(4, hand)
+	assertScore(t, 4, hand)
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
@@ -332,7 +332,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls5, Balls5}},
 		Set{Tiles: []Tile{Bamboo8, Bamboo8, Bamboo8}},
 	}}
-	assertScore((2+8+20)*2, hand) // 60
+	assertScore(t, (2+8+20)*2, hand) // 60
 	if allPungs(hand, 60) == 0 {
 		t.Error("Hand should have been recognised as all pungs.")
 	}
@@ -348,7 +348,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls5, Balls5, Balls5}, Concealed: true},
 		Set{Tiles: []Tile{Bamboo1, Bamboo2, Bamboo3}},
 	}}
-	assertScore((2+4+4+16+20)*2, hand) // 92
+	assertScore(t, (2+4+4+16+20)*2, hand) // 92
 	if threeConcealedPungs(hand, 92) == 0 {
 		t.Error("Hand should have been recognised as three concealed pungs.")
 	}
@@ -364,7 +364,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
 		Set{Tiles: []Tile{Bamboo1, Bamboo2, Bamboo3}},
 	}}
-	assertScore(40, hand)
+	assertScore(t, 40, hand)
 	if chowHand(hand, 20) == 0 {
 		t.Error("Hand should have been recognised as chow hand.")
 	}
@@ -380,7 +380,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
 		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
 	}}
-	assertScore(22*2, hand)
+	assertScore(t, 22*2, hand)
 	if allSimples(hand, 44) == 0 {
 		t.Error("Hand should have been recognised as all simples.")
 	}
@@ -394,7 +394,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
 		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
 	}}
-	assertScore(4, hand)
+	assertScore(t, 4, hand)
 	if allSimples(hand, 4) == 0 {
 		t.Error("Hand should have been recognised as all simples.")
 	}
@@ -408,7 +408,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{WindNorth, WindNorth, WindNorth}}, // 4 + 1d
 		Set{Tiles: []Tile{Bamboo9, Bamboo9, Bamboo9}},       // 4
 	}}
-	assertScore(16*8, hand)
+	assertScore(t, 16*8, hand)
 	if allTerminalsHonours(hand, 128) == 0 {
 		t.Error("Hand should have been recognised as all terminals & honours.")
 	}
@@ -421,7 +421,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Chars4, Chars5, Chars6}},
 		Set{Tiles: []Tile{Chars2, Chars2, Chars2}}, // 2
 	}}
-	assertScore((20+2+4+2)*4, hand) // 56
+	assertScore(t, (20+2+4+2)*4, hand) // 56
 	if halfFlush(hand, 56) == 0 {
 		t.Error("Hand should have been recognised as half-flush.")
 	}
@@ -435,7 +435,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Chars4, Chars5, Chars6}},
 		Set{Tiles: []Tile{Chars2, Chars2, Chars2}}, // 2
 	}}
-	assertScore(24, hand)
+	assertScore(t, 24, hand)
 	if halfFlush(hand, 24) == 0 {
 		t.Error("Hand should have been recognised as half-flush.")
 	}
@@ -448,7 +448,7 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		Set{Tiles: []Tile{Bamboo9, Bamboo9, Bamboo9}}, // 4
 		Set{Tiles: []Tile{Balls1, Balls1, Balls1}},    // 4
 	}}
-	assertScore((20+4+4+4)*4, hand) // 128
+	assertScore(t, (20+4+4+4)*4, hand) // 128
 	if outsideHand(hand, 128) == 0 {
 		t.Error("Hand should have been recognised as outside hand.")
 	}

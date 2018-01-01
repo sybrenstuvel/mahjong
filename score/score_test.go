@@ -256,6 +256,16 @@ func (s *ScoreTestSuite) TestScore(t *check.C) {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
 
+	// Chow and concealed pung of dragons
+	hand = &Hand{Sets: []Set{
+		Set{Tiles: []Tile{Balls1, Balls2, Balls3}, Concealed: false},
+		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}, Concealed: true},
+	}}
+	assertScore(64, hand)
+	if hand.Winning {
+		t.Error("Hand should have been recognised as non-winning.")
+	}
+
 	// Winning hand with no doubles.
 	hand = &Hand{Sets: []Set{
 		Set{Tiles: []Tile{Balls9, Balls9}},

@@ -210,6 +210,10 @@ func halfFlush(hand *Hand, simpleScore int) int {
 }
 
 func outsideHand(hand *Hand, simpleScore int) int {
+	if !hand.Winning {
+		return 0
+	}
+
 	nrOfChows := 0
 	for idx := range hand.Sets {
 		set := &hand.Sets[idx]

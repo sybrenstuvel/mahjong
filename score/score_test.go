@@ -221,11 +221,9 @@ func (s *ScoreTestSuite) TestScoreEmptyHand(t *check.C) {
 	}
 }
 
-func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
-	var hand *Hand
-
+func (s *ScoreTestSuite) TestScoreTwoPairsPung(t *check.C) {
 	// Two pairs of dragons and a pung of balls 1
-	hand = &Hand{Sets: []Set{
+	hand := &Hand{Sets: []Set{
 		Set{Tiles: []Tile{DragonRed, DragonRed}},
 		Set{Tiles: []Tile{DragonGreen, DragonGreen}},
 		Set{Tiles: []Tile{Balls1, Balls1, Balls1}},
@@ -234,9 +232,11 @@ func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
+}
 
+func (s *ScoreTestSuite) TestScoreTwoChowsPungSimples(t *check.C) {
 	// Two chows and a pung of simples
-	hand = &Hand{Sets: []Set{
+	hand := &Hand{Sets: []Set{
 		Set{Tiles: []Tile{Bamboo4, Bamboo5, Bamboo6}},
 		Set{Tiles: []Tile{Balls1, Balls3, Balls2}},
 		Set{Tiles: []Tile{Chars4, Chars4, Chars4}},
@@ -245,9 +245,11 @@ func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
+}
 
+func (s *ScoreTestSuite) TestKongDragonConcealedPung(t *check.C) {
 	// Kong of dragons and a concealed pung of simples
-	hand = &Hand{Sets: []Set{
+	hand := &Hand{Sets: []Set{
 		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}},
 		Set{Tiles: []Tile{Chars4, Chars4, Chars4}, Concealed: true},
 	}}
@@ -255,9 +257,11 @@ func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
+}
 
+func (s *ScoreTestSuite) TestScoreChowConcealedPung(t *check.C) {
 	// Chow and concealed pung of dragons
-	hand = &Hand{Sets: []Set{
+	hand := &Hand{Sets: []Set{
 		Set{Tiles: []Tile{Balls1, Balls2, Balls3}, Concealed: false},
 		Set{Tiles: []Tile{DragonGreen, DragonGreen, DragonGreen, DragonGreen}, Concealed: true},
 	}}
@@ -265,9 +269,11 @@ func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
 	if hand.Winning {
 		t.Error("Hand should have been recognised as non-winning.")
 	}
+}
 
+func (s *ScoreTestSuite) TestScoreWinningHandNoDoubles(t *check.C) {
 	// Winning hand with no doubles.
-	hand = &Hand{Sets: []Set{
+	hand := &Hand{Sets: []Set{
 		Set{Tiles: []Tile{Balls9, Balls9}},
 		Set{Tiles: []Tile{Bamboo2, Bamboo3, Bamboo4}},
 		Set{Tiles: []Tile{Balls5, Balls6, Balls7}},
@@ -281,7 +287,10 @@ func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
 	if fullFlush(hand, 38) != 0 {
 		t.Error("Hand should not be detected as full flush")
 	}
+}
 
+func (s *ScoreTestSuite) TestScoreTODOSplit(t *check.C) {
+	var hand *Hand
 	// Winning hand with full flush
 	hand = &Hand{Sets: []Set{
 		Set{Tiles: []Tile{Balls9, Balls9}},

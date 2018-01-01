@@ -2,6 +2,8 @@ package score
 
 import (
 	"sort"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // IsValid returns (is valid, is chow) for this set.
@@ -121,6 +123,8 @@ func Score(hand *Hand) int {
 	nrOfPungs := 0
 	nrOfPillows := 0
 
+	log.WithField("hand", hand).Debug("calculating hand score")
+
 	// Sorting the sets makes it easier to detect pure straights, nine gates and others.
 	sort.Sort(SortSetsByTileOrder(hand.Sets))
 
@@ -128,7 +132,12 @@ func Score(hand *Hand) int {
 	for idx := range hand.Sets {
 		set := &hand.Sets[idx]
 		setScore, setDoubles, isValid := set.Score(hand.WindOwn, hand.WindRound)
-
+		log.WithFields(log.Fields{
+			"set-idx": idx,
+			"score":   setScore,
+			"doubles": setDoubles,
+			"valid":   isValid,
+		}).Debug("set score calculated")
 		if !isValid {
 			continue
 		}
@@ -153,9 +162,21 @@ func Score(hand *Hand) int {
 	}
 
 	// Count doubles
-	for _, detector := range detectors {
-		totalDoubles += detector(hand, totalScore)
+	for label, detector := range detectors {
+		doubles := detector(hand, totalScore)
+		log.WithFields(log.Fields{
+			"detector": label,
+			"doubles":  doubles,
+		}).Debug("ran detector")
+		totalDoubles += doubles
 	}
 
-	return totalScore * 1 << uint(totalDoubles)
+	finalScore := totalScore * 1 << uint(totalDoubles)
+	log.WithFields(log.Fields{
+		"tile-score": totalScore,
+		"doubles":    totalDoubles,
+		"score":      finalScore,
+	}).Debug("hand score calculated")
+
+	return finalScore
 }

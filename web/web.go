@@ -3,6 +3,8 @@ package web
 import (
 	"errors"
 	"html/template"
+	"mahjong/score"
+	"math/rand"
 	"net/http"
 	"strings"
 
@@ -35,10 +37,49 @@ func (p *Pages) showScorePage(w http.ResponseWriter, r *http.Request) {
 	p.showTemplate("templates/score.html", w, r, TemplateData{})
 }
 
+func (p *Pages) apiRandom(w http.ResponseWriter, r *http.Request) {
+	randWind := func() score.Tile {
+		return score.Tile(int(score.WindEast) + rand.Intn(4))
+	}
+	hand := score.Hand{
+		Sets: []score.Set{
+			score.Set{
+				Tiles:     []score.Tile{score.Balls1, score.Balls2, score.Balls3},
+				Concealed: false,
+			},
+			score.Set{
+				Tiles:     []score.Tile{score.DragonGreen, score.DragonGreen, score.DragonGreen, score.DragonGreen},
+				Concealed: true,
+			},
+		},
+		WindOwn:   randWind(),
+		WindRound: randWind(),
+	}
+
+	logger := log.WithField("addr", r.RemoteAddr)
+	replyJSON(w, &hand, logger)
+}
+
+func (p *Pages) apiCalcScore(w http.ResponseWriter, r *http.Request) {
+	logger := log.WithField("addr", r.RemoteAddr)
+	hand := score.Hand{}
+	if DecodeJSON(w, r.Body, &hand, logger) != nil {
+		return
+	}
+
+	handScore := Score{
+		score.Score(&hand),
+	}
+
+	replyJSON(w, &handScore, logger)
+}
+
 // AddRoutes adds routes to serve reporting status requests.
 func (p *Pages) AddRoutes(router *mux.Router) {
 	router.HandleFunc("/", p.showIndexPage).Methods("GET")
 	router.HandleFunc("/score", p.showScorePage).Methods("GET")
+	router.HandleFunc("/api/random", p.apiRandom).Methods("GET")
+	router.HandleFunc("/api/calc-score", p.apiCalcScore).Methods("POST")
 	// router.HandleFunc("/as-json", rep.sendStatusReport).Methods("GET")
 	// router.HandleFunc("/latest-image", rep.showLatestImagePage).Methods("GET")
 	// router.HandleFunc("/worker-action/{worker-id}", rep.workerAction).Methods("POST")

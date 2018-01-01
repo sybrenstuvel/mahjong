@@ -34,10 +34,14 @@ h1 img {
     float: right;
 }
 
-input {
+input, textarea {
     color: black;
 }
-
+.btn {
+    color: white;
+    background-color: #555;
+    border: 2px solid black;
+}
 
 .error {
     color: #a92a2a;

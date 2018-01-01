@@ -20,17 +20,29 @@ const IsoFormat = "2006-01-02T15:04:05-0700"
 
 // DecodeJSON decodes JSON from an io.Reader, and writes a Bad Request status if it fails.
 func DecodeJSON(w http.ResponseWriter, r io.Reader, document interface{},
-	logprefix string) error {
+	logger *log.Entry) error {
 	dec := json.NewDecoder(r)
 
 	if err := dec.Decode(document); err != nil {
-		log.Warningf("%s Unable to decode JSON: %s", logprefix, err)
+		logger.WithError(err).Warning("unable to decode JSON")
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Unable to decode JSON: %s\n", err)
 		return err
 	}
 
 	return nil
+}
+
+func replyJSON(w http.ResponseWriter, document interface{}, logger *log.Entry) {
+	w.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(w)
+
+	if err := enc.Encode(document); err != nil {
+		log.WithError(err).WithField("document", document).Warning("unable to encode JSON")
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "unable to encode JSON: %s", err)
+		return
+	}
 }
 
 // SendJSON sends a JSON document to some URL via HTTP.
